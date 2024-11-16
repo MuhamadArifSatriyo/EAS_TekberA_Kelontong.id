@@ -9,12 +9,13 @@ class WelcomeScreen extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.only(top: 100, bottom: 40),
         decoration: BoxDecoration(
-            color: Colors.black,
-            image: DecorationImage(
-              image: AssetImage("images/bg.jpg"),
-              fit: BoxFit.cover,
-              opacity: 0.6,
-            )),
+          color: Colors.black,
+          image: DecorationImage(
+            image: AssetImage("images/bg.jpg"),
+            fit: BoxFit.cover,
+            opacity: 0.6,
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -42,16 +43,15 @@ class WelcomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomeScreen(),
-                          ));
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(),
+                        ),
+                      );
                     },
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                      decoration: BoxDecoration(),
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                       child: Text(
                         "Yuk Mulai",
                         style: TextStyle(
@@ -63,9 +63,9 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
