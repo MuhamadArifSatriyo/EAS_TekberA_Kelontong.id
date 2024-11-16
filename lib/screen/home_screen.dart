@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../screen/tambah_barang.dart'; // Import layar TambahBarangScreen
+import 'package:inventory_manager/widget/kelontong_drawer.dart';
+import '../screen/tambah_barang.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
