@@ -58,47 +58,66 @@ class DetailBarang extends StatelessWidget {
               ),
             const SizedBox(height: 16),
             // Nama Barang
-            Text(
-              item['name'],
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    blurRadius: 8.0,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            // Kategori
-            Text(
-              'Kategori: ${item['category']}',
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            // Harga
-            Text(
-              'Harga: Rp ${item['price'].toStringAsFixed(0)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 8),
-            // Stok
-            Text(
-              'Stok: ${item['stock']} (${item['status']})',
-              style: TextStyle(
-                fontSize: 16,
-                color: _getStatusColor(item['status']),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Deskripsi
-            Text(
-              'Deskripsi:',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              item['description'] ?? 'Tidak ada deskripsi.',
-              style: const TextStyle(fontSize: 16),
+              width: double.infinity,
+              padding: EdgeInsets.all(16),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item['name'],
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Kategori
+                    Text(
+                      'Kategori: ${item['category']}',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 8),
+                    // Harga
+                    Text(
+                      'Harga: Rp ${item['price'].toStringAsFixed(0)}',
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 8),
+                    // Stok
+                    Text(
+                      'Stok: ${item['stock']} (${item['status']})',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: _getStatusColor(item['status']),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Deskripsi
+                    Text(
+                      'Deskripsi:',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      item['description'] ?? 'Tidak ada deskripsi.',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ]),
             ),
           ],
         ),
