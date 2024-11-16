@@ -51,7 +51,8 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                       child: Text(
                         "Yuk Mulai",
                         style: TextStyle(

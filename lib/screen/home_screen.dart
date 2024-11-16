@@ -35,7 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredInventory = _selectedCategory == 'All'
         ? _inventory
-        : _inventory.where((item) => item['category'] == _selectedCategory).toList();
+        : _inventory
+            .where((item) => item['category'] == _selectedCategory)
+            .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Helper for item cards
-  Widget _buildItemCard(String itemName, String status, int count, Color statusColor) {
+  Widget _buildItemCard(
+      String itemName, String status, int count, Color statusColor) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
