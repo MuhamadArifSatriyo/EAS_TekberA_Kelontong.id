@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../screen/tambah_barang.dart';
+import '../screen/tambah_barang.dart'; // Import layar TambahBarangScreen
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -94,9 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {},
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu, color: Colors.black),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Open the drawer when menu is tapped
+              },
+            );
+          },
         ),
         title: const Text(
           'Inventory Manager',
@@ -104,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         centerTitle: true,
       ),
+      drawer: AppDrawer(), // Add the AppDrawer here
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
