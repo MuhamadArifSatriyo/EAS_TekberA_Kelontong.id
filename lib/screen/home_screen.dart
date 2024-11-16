@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisCount: 2,
                         mainAxisSpacing: 12.0,
                         crossAxisSpacing: 12.0,
-                        childAspectRatio: 1.0,
+                        childAspectRatio: 0.65,
                       ),
                       itemCount: filteredInventory.length,
                       itemBuilder: (context, index) {
@@ -295,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 48,
                 ),
               ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // Nama Barang
             Text(
               item['name'],
@@ -306,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             // Kategori
             Text(
               item['category'],
@@ -314,8 +314,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 12,
                 color: Colors.grey[600],
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            const Spacer(),
+            Spacer(),
             // Harga
             Text(
               'Rp ${item['price'].toStringAsFixed(0)}',
@@ -324,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 24),
             // Status Stok
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
