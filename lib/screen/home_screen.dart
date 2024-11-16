@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_manager/widget/kelontong_drawer.dart';
-import '../screen/tambah_barang.dart'; 
+import '../screen/tambah_barang.dart';
+import '../screen/detail_barang.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -33,20 +36,29 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadInventory();
   }
 
+  // Load inventory from text file
   Future<void> _loadInventory() async {
-    // Load inventory from SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    final String? inventoryJson = prefs.getString('inventory');
-    if (inventoryJson != null) {
-      // Parse and set inventory
-      // You'll need to implement the parsing logic
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/inventory.txt');
+
+    if (await file.exists()) {
+      final contents = await file.readAsString();
+      List<dynamic> jsonData =
+          json.decode(contents); // Decode the saved JSON data
+      setState(() {
+        _inventory = List<Map<String, dynamic>>.from(jsonData);
+      });
     }
   }
 
+  // Save inventory to a text file
   Future<void> _saveInventory() async {
-    // Save inventory to SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    // You'll need to implement the saving logic
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/inventory.txt');
+
+    // Encode the inventory list to JSON
+    String jsonData = json.encode(_inventory);
+    await file.writeAsString(jsonData);
   }
 
   void _handleAddItem(Map<String, dynamic> itemData) {
@@ -87,8 +99,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredInventory = _inventory
         .where((item) =>
-            (_selectedCategory == 'All' || item['category'] == _selectedCategory) &&
-            item['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()))
+            (_selectedCategory == 'All' ||
+                item['category'] == _selectedCategory) &&
+            item['name']
+                .toString()
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -100,7 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
             return IconButton(
               icon: const Icon(Icons.menu, color: Colors.black),
               onPressed: () {
-                Scaffold.of(context).openDrawer(); // Open the drawer when menu is tapped
+                Scaffold.of(context)
+                    .openDrawer(); // Open the drawer when menu is tapped
               },
             );
           },
@@ -187,7 +204,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     )
                   : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         mainAxisSpacing: 12.0,
                         crossAxisSpacing: 12.0,
@@ -219,120 +237,130 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildItemCard(Map<String, dynamic> item) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12.0),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.2),
-          blurRadius: 8.0,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Tambahkan Gambar
-        if (item['imagePath'] != null)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: kIsWeb
-                ? Image.network(
-                    item['imagePath'],
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  )
-                : Image.file(
-                    File(item['imagePath']),
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-          )
-        else
-          Container(
-            height: 100,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.image_not_supported,
-              color: Colors.grey,
-              size: 48,
-            ),
+    return GestureDetector(
+      onTap: () {
+        // Navigasi ke halaman detail barang
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailBarang(item: item),
           ),
-        const SizedBox(height: 8),
-        // Nama Barang
-        Text(
-          item['name'],
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 8),
-        // Kategori
-        Text(
-          item['category'],
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-        const Spacer(),
-        // Harga
-        Text(
-          'Rp ${item['price'].toStringAsFixed(0)}',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Status Stok
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${item['stock']}',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: _getStatusColor(item['status']),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: _getStatusColor(item['status']).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                item['status'],
-                style: TextStyle(
-                  fontSize: 12,
-                  color: _getStatusColor(item['status']),
-                ),
-              ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 8.0,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-      ],
-    ),
-  );
-}
-
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tambahkan Gambar
+            if (item['imagePath'] != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: kIsWeb
+                    ? Image.network(
+                        item['imagePath'],
+                        height: 100,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        File(item['imagePath']),
+                        height: 100,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+              )
+            else
+              Container(
+                height: 100,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.image_not_supported,
+                  color: Colors.grey,
+                  size: 48,
+                ),
+              ),
+            const SizedBox(height: 8),
+            // Nama Barang
+            Text(
+              item['name'],
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            // Kategori
+            Text(
+              item['category'],
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+            ),
+            const Spacer(),
+            // Harga
+            Text(
+              'Rp ${item['price'].toStringAsFixed(0)}',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Status Stok
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${item['stock']}',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: _getStatusColor(item['status']),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(item['status']).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    item['status'],
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _getStatusColor(item['status']),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
