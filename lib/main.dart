@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 //hallo
 void main() {
-  runApp(MyApp());
+  runApp(exapp());
 }
 
 class Item {
@@ -31,7 +31,7 @@ class Inventory {
   }
 }
 
-class MyApp extends StatelessWidget {
+class exapp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
