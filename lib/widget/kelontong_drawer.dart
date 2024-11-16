@@ -9,13 +9,22 @@ class AppDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue, // Warna pertama
+                  Colors.purple, // Warna kedua
+                  Colors.orange, // Warna ketiga
+                ],
+              ),
             ),
             child: Column(
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage('images/profile.png'), // Add your image here
+                  backgroundImage:
+                      AssetImage('images/profile.png'), // Add your image here
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -33,7 +42,8 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.home),
             title: const Text('Home'),
             onTap: () {
-              Navigator.pushNamed(context, '/home'); // Adjust the route to '/home'
+              Navigator.pushNamed(
+                  context, '/home'); // Adjust the route to '/home'
             },
           ),
           ListTile(
