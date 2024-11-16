@@ -1,60 +1,93 @@
 import 'package:flutter/material.dart';
 
-class TambahBarangScreen extends StatefulWidget {
+class TambahBarang extends StatefulWidget {
+  final Function(String, String, int, String) onAddItem;
+
+  const TambahBarang({Key? key, required this.onAddItem}) : super(key: key);
+
   @override
-  _TambahBarangScreenState createState() => _TambahBarangScreenState();
+  _TambahBarangState createState() => _TambahBarangState();
 }
 
-class _TambahBarangScreenState extends State<TambahBarangScreen> {
-  final itemNameController = TextEditingController();
-  final quantityController = TextEditingController();
+class _TambahBarangState extends State<TambahBarang> {
+  final _namaBarangController = TextEditingController();
+  final _stokController = TextEditingController();
+  String _selectedCategory = 'Makanan';
 
-  @override
-  void dispose() {
-    itemNameController.dispose();
-    quantityController.dispose();
-    super.dispose();
-  }
-
-  void saveItem() {
-    final name = itemNameController.text;
-    final quantity = int.tryParse(quantityController.text) ?? 0;
-
-    if (name.isNotEmpty && quantity > 0) {
-      Navigator.of(context).pop({'name': name, 'quantity': quantity});
-    }
-  }
+  final List<String> _categories = [
+    'Makanan',
+    'Sayuran',
+    'Peralatan Rumah Tangga',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tambah Barang'),
+        title: const Text('Tambah Barang'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Nama Barang
             TextField(
-              controller: itemNameController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
+              controller: _namaBarangController,
+              decoration: const InputDecoration(
                 labelText: 'Nama Barang',
-              ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: quantityController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Jumlah',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 16.0),
+
+            // Kategori Barang
+            DropdownButtonFormField<String>(
+              value: _selectedCategory,
+              onChanged: (value) {
+                setState(() {
+                  _selectedCategory = value!;
+                });
+              },
+              items: _categories.map((category) {
+                return DropdownMenuItem(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+              decoration: const InputDecoration(
+                labelText: 'Kategori Barang',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+
+            // Stok Barang
+            TextField(
+              controller: _stokController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Stok Barang',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+
+            // Tombol Tambah Barang
             ElevatedButton(
-              onPressed: saveItem,
-              child: Text('Simpan'),
+              onPressed: () {
+                if (_namaBarangController.text.isNotEmpty &&
+                    _stokController.text.isNotEmpty) {
+                  widget.onAddItem(
+                    _namaBarangController.text,
+                    _selectedCategory,
+                    int.parse(_stokController.text),
+                    'Stok Aman',
+                  );
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Tambah Barang'),
             ),
           ],
         ),
