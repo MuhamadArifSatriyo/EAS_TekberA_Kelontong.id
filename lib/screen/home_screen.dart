@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-//hallo
-void main() {
-  runApp(MyApp());
-}
-
+// Model Item
 class Item {
   final String name;
   final int quantity;
@@ -13,6 +9,7 @@ class Item {
   Item({required this.name, required this.quantity});
 }
 
+// Class Inventory untuk mengelola daftar Item
 class Inventory {
   List<Item> items;
 
@@ -31,38 +28,41 @@ class Inventory {
   }
 }
 
-class MyApp extends StatelessWidget {
+// HomeScreen sebagai halaman utama
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'GFG Inventory Manager',
+      title: 'Kelontong.ID',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.orange,
       ),
       home: InventoryScreen(),
     );
   }
 }
 
+// InventoryScreen dengan StatefulWidget
 class InventoryScreen extends StatefulWidget {
   @override
   _InventoryScreenState createState() => _InventoryScreenState();
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  late Inventory inventory;
+  late Inventory inventory; // Inventory untuk menyimpan daftar barang
   final itemNameController = TextEditingController();
   final quantityController = TextEditingController();
-
   int selectedIndex = -1;
 
   @override
   void initState() {
     super.initState();
+    inventory = Inventory([]); // Inisialisasi awal dengan daftar kosong
     loadInventory();
   }
 
+  // Fungsi untuk memuat data dari SharedPreferences
   Future<void> loadInventory() async {
     final prefs = await SharedPreferences.getInstance();
     final items = prefs.getStringList('inventory') ?? [];
@@ -76,21 +76,22 @@ class _InventoryScreenState extends State<InventoryScreen> {
     });
   }
 
+  // Fungsi untuk menyimpan data ke SharedPreferences
   Future<void> saveInventory() async {
     final prefs = await SharedPreferences.getInstance();
-    final items = inventory!.items
-        .map((item) => '${item.name}:${item.quantity}')
-        .toList();
+    final items =
+        inventory.items.map((item) => '${item.name}:${item.quantity}').toList();
     prefs.setStringList('inventory', items);
   }
 
+  // Fungsi untuk menambahkan item
   void addItem() {
     final name = itemNameController.text;
     final quantity = int.tryParse(quantityController.text) ?? 0;
 
     if (name.isNotEmpty && quantity > 0) {
       setState(() {
-        inventory!.addItem(Item(name: name, quantity: quantity));
+        inventory.addItem(Item(name: name, quantity: quantity));
         itemNameController.clear();
         quantityController.clear();
         saveInventory();
@@ -98,14 +99,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
     }
   }
 
+  // Fungsi untuk mengedit item
   void editItem() {
     final name = itemNameController.text;
     final quantity = int.tryParse(quantityController.text) ?? 0;
 
     if (name.isNotEmpty && quantity > 0) {
       setState(() {
-        inventory!
-            .editItem(selectedIndex, Item(name: name, quantity: quantity));
+        inventory.editItem(selectedIndex, Item(name: name, quantity: quantity));
         itemNameController.clear();
         quantityController.clear();
         saveInventory();
@@ -114,16 +115,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
     }
   }
 
+  // Fungsi untuk menghapus item
   void deleteItem(int index) {
     setState(() {
-      inventory!.deleteItem(index);
+      inventory.deleteItem(index);
       saveInventory();
     });
   }
 
+  // Dialog untuk mengedit item
   void showEditDialog(int index) {
-    itemNameController.text = inventory!.items[index].name;
-    quantityController.text = inventory!.items[index].quantity.toString();
+    itemNameController.text = inventory.items[index].name;
+    quantityController.text = inventory.items[index].quantity.toString();
     selectedIndex = index;
 
     showDialog(
@@ -170,15 +173,15 @@ class _InventoryScreenState extends State<InventoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('GFG Inventory Manager'),
+        title: Text('Kelontong.ID - Inventory Manager'),
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: inventory!.items.length,
+              itemCount: inventory.items.length,
               itemBuilder: (context, index) {
-                final item = inventory!.items[index];
+                final item = inventory.items[index];
                 return Card(
                   child: ListTile(
                     title: Text(item.name),
@@ -212,14 +215,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 TextField(
                   controller: itemNameController,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Item Name'),
+                    border: OutlineInputBorder(),
+                    labelText: 'Item Name',
+                  ),
                 ),
                 SizedBox(height: 20),
                 TextField(
                   controller: quantityController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Quantity'),
+                    border: OutlineInputBorder(),
+                    labelText: 'Quantity',
+                  ),
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
