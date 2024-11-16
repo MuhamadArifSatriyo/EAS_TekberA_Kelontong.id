@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../screen/welcome_screen.dart';
 
 void main() {
-  runApp(exapp());
+  runApp(MyApp());
 }
 
-class exapp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
