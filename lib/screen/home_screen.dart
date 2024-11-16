@@ -209,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisCount: 2,
                         mainAxisSpacing: 12.0,
                         crossAxisSpacing: 12.0,
-                        childAspectRatio: 0.65,
+                        childAspectRatio: 0.60,
                       ),
                       itemCount: filteredInventory.length,
                       itemBuilder: (context, index) {
@@ -317,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            Spacer(),
+            SizedBox(height: 8),
             // Harga
             Text(
               'Rp ${item['price'].toStringAsFixed(0)}',
@@ -326,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 8),
             // Status Stok
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
