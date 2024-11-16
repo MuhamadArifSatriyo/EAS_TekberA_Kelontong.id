@@ -23,75 +23,85 @@ class _TambahBarangState extends State<TambahBarang> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tambah Barang'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Nama Barang
-            TextField(
-              controller: _namaBarangController,
-              decoration: const InputDecoration(
-                labelText: 'Nama Barang',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-
-            // Kategori Barang
-            DropdownButtonFormField<String>(
-              value: _selectedCategory,
-              onChanged: (value) {
-                setState(() {
-                  _selectedCategory = value!;
-                });
-              },
-              items: _categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              decoration: const InputDecoration(
-                labelText: 'Kategori Barang',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-
-            // Stok Barang
-            TextField(
-              controller: _stokController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Stok Barang',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-
-            // Tombol Tambah Barang
-            ElevatedButton(
-              onPressed: () {
-                if (_namaBarangController.text.isNotEmpty &&
-                    _stokController.text.isNotEmpty) {
-                  widget.onAddItem(
-                    _namaBarangController.text,
-                    _selectedCategory,
-                    int.parse(_stokController.text),
-                    'Stok Aman',
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Tambah Barang'),
-            ),
-          ],
+        appBar: AppBar(
+          title: const Text('Tambah Barang'),
         ),
-      ),
-    );
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(12)),
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nama Barang
+                    TextField(
+                      controller: _namaBarangController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nama Barang',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+
+                    // Kategori Barang
+                    DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value!;
+                        });
+                      },
+                      items: _categories.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      decoration: const InputDecoration(
+                        labelText: 'Kategori Barang',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+
+                    // Stok Barang
+                    TextField(
+                      controller: _stokController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Stok Barang',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+
+                    // Tombol Tambah Barang
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_namaBarangController.text.isNotEmpty &&
+                            _stokController.text.isNotEmpty) {
+                          widget.onAddItem(
+                            _namaBarangController.text,
+                            _selectedCategory,
+                            int.parse(_stokController.text),
+                            'Stok Aman',
+                          );
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text('Tambah Barang'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }
