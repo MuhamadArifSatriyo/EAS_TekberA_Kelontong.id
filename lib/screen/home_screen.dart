@@ -36,8 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadInventory();
-<<<<<<< HEAD
-    _loadNamaToko(); 
+    _loadNamaToko();
   }
 
   // Load Nama Toko dari SharedPreferences
@@ -46,11 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _namaToko = prefs.getString('namaToko') ?? 'Toko Anda';
     });
-    debugPrint('Nama Toko yang Dimuat: $_namaToko'); // Debugging
-  }
-
-  // Load inventory dari text file
-=======
   }
 
   // Load inventory dari text file
@@ -60,12 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (await file.exists()) {
       final contents = await file.readAsString();
-<<<<<<< HEAD
       List<dynamic> jsonData = json.decode(contents);
-=======
-      List<dynamic> jsonData =
-          json.decode(contents); // Decode the saved JSON data
->>>>>>> main
       setState(() {
         _inventory = List<Map<String, dynamic>>.from(jsonData);
       });
@@ -115,62 +104,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-<<<<<<< HEAD
   // Fungsi untuk debugging SharedPreferences
   Future<void> printSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
   }
 
-=======
->>>>>>> main
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filteredInventory = _inventory
-        .where((item) =>
-            (_selectedCategory == 'All' ||
-                item['category'] == _selectedCategory) &&
-            item['name']
-                .toString()
-                .toLowerCase()
-                .contains(_searchQuery.toLowerCase()))
-        .toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () {
-<<<<<<< HEAD
-                Scaffold.of(context).openDrawer();
-=======
-                Scaffold.of(context)
-                    .openDrawer(); // Open the drawer when menu is tapped
->>>>>>> main
-              },
-            );
-          },
-        ),
-<<<<<<< HEAD
-        title: Text(
-          'Halo, $_namaToko',
-=======
-        title: const Text(
-          'Inventory Manager',
->>>>>>> main
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: true,
-      ),
-      drawer: AppDrawer(), // Add the AppDrawer here
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
     return DefaultTabController(
       length: _categories.length,
       child: Scaffold(
@@ -292,12 +233,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
-  <<<<<<< HEAD
-        backgroundColor: Colors.orange,
-=======
-        backgroundColor: Colors.blue,
-  >>>>>>> main
-        child: const Icon(Icons.add, color: Colors.white),
+          backgroundColor: Colors.blue,
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );

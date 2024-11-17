@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< HEAD
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screen/home_screen.dart';
 
@@ -40,11 +39,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
-=======
-import '../screen/home_screen.dart';
-
-class WelcomeScreen extends StatelessWidget {
->>>>>>> main
   @override
   Widget build(BuildContext context) {
     return Material(

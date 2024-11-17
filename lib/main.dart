@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import '../screen/welcome_screen.dart';
-<<<<<<< HEAD
 import '../screen/home_screen.dart';  
 import '../screen/dashboard_screen.dart'; 
 import '../screen/about_us_screen.dart'; 
-=======
-import '../screen/home_screen.dart';  // Import your HomeScreen
-import '../screen/dashboard_screen.dart'; // Import DashboardScreen (create if needed)
-import '../screen/about_us_screen.dart'; // Import AboutUsScreen (create if needed)
->>>>>>> main
 
 void main() {
   runApp(MyApp());
@@ -19,12 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-<<<<<<< HEAD
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-=======
-      theme:
-          ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 89, 68, 40)),
->>>>>>> main
       initialRoute:
           '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
       routes: {
