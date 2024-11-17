@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+      theme: ThemeData(scaffoldBackgroundColor: Color.fromARGB(255, 106, 23, 58)),
       initialRoute: '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
       routes: {
         '/': (context) => WelcomeScreen(), // Welcome screen route
