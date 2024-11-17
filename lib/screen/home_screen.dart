@@ -70,6 +70,25 @@ class _HomeScreenState extends State<HomeScreen> {
     await file.writeAsString(jsonData);
   }
 
+  void _onEditItem(Map<String, dynamic> updatedItem) {
+    setState(() {
+      final index =
+          _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
+      if (index != -1) {
+        _inventory[index] = updatedItem; // Update item
+      }
+    });
+    _saveInventory(); // Simpan data yang telah diperbarui
+  }
+
+  void _onDeleteItem(Map<String, dynamic> deletedItem) {
+    setState(() {
+      _inventory.removeWhere(
+          (item) => item['name'] == deletedItem['name']); // Hapus item
+    });
+    _saveInventory(); // Simpan data setelah dihapus
+  }
+
   void _handleAddItem(Map<String, dynamic> itemData) {
     setState(() {
       _inventory.add({
@@ -104,6 +123,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk debugging SharedPreferences
+  Future<void> printSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -134,7 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   text: '$_namaToko', // Store name part
                   style: const TextStyle(
                     color: Colors.black, // Black color for store name
-                    fontWeight: FontWeight.normal, // Normal weight for store name
+                    fontWeight:
+                        FontWeight.normal, // Normal weight for store name
                   ),
                 ),
               ],
@@ -340,7 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
               decoration: BoxDecoration(
                 color: _getStatusColor(item['status']),
                 borderRadius: BorderRadius.circular(12.0),
@@ -357,20 +384,5 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  void _onEditItem(Map<String, dynamic> item) {
-    setState(() {
-      int index = _inventory.indexOf(item);
-      _inventory[index] = item; // Update the item
-    });
-    _saveInventory();
-  }
-
-  void _onDeleteItem(Map<String, dynamic> item) {
-    setState(() {
-      _inventory.remove(item);
-    });
-    _saveInventory();
   }
 }
