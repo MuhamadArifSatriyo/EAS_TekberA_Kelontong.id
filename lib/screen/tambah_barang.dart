@@ -186,6 +186,7 @@ class _TambahBarangState extends State<TambahBarang> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tambah Barang'),
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -213,12 +214,14 @@ class _TambahBarangState extends State<TambahBarang> {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300),
+                    color: const Color.fromARGB(255, 234, 234, 234),
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 102, 99, 99)),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: const Color.fromARGB(255, 76, 70, 70)
+                            .withOpacity(0.1),
                         spreadRadius: 1,
                         blurRadius: 3,
                         offset: const Offset(0, 2),

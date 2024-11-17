@@ -6,7 +6,7 @@ class AboutUsScreen extends StatelessWidget {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('About Me'),
+        title: Text('Tentang Aplikasi Kelontong.ID'),
       ),
       body: Center(
         child: Text(

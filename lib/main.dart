@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme:
-          ThemeData(scaffoldBackgroundColor: Color.fromARGB(255, 106, 23, 58)),
+          ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 89, 68, 40)),
       initialRoute:
           '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
       routes: {

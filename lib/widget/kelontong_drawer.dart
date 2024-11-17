@@ -34,9 +34,9 @@ class _AppDrawerState extends State<AppDrawer> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.blue, // Warna pertama
-                  Colors.purple, // Warna kedua
-                  Colors.orange, // Warna ketiga
+                  Color.fromARGB(255, 223, 164, 16),
+                  Color.fromARGB(255, 167, 87, 31),
+                  Color.fromARGB(255, 93, 41, 5),
                 ],
               ),
             ),

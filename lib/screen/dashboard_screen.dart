@@ -6,7 +6,7 @@ class DashboardScreen extends StatelessWidget {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('About Me'),
+        title: Text('Dasboard Penjualan Toko'),
       ),
       body: Center(
         child: Text(

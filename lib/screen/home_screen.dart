@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
-  String _selectedCategory = 'All';
   String _searchQuery = '';
   String _namaToko = 'Toko Anda'; // Variabel untuk menyimpan nama toko
   final TextEditingController _searchController = TextEditingController();
@@ -31,11 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
     'Lainnya',
   ];
 
+  int _selectedTabIndex = 0;
+
   @override
   void initState() {
     super.initState();
     _loadInventory();
-    _loadNamaToko(); // Panggil fungsi untuk memuat nama toko
+    _loadNamaToko();
   }
 
   // Load Nama Toko dari SharedPreferences
@@ -44,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _namaToko = prefs.getString('namaToko') ?? 'Toko Anda';
     });
-    debugPrint('Nama Toko yang Dimuat: $_namaToko'); // Debugging
   }
 
   // Load inventory dari text file
@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'price': itemData['harga'],
         'description': itemData['deskripsi'],
         'status': _getStockStatus(itemData['stok']),
-        'imagePath': itemData['imagePath'], // Tambahkan path gambar
+        'imagePath': itemData['imagePath'],
       });
     });
     _saveInventory();
@@ -104,148 +104,132 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Fungsi untuk debugging SharedPreferences
-  Future<void> printSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filteredInventory = _inventory
-        .where((item) =>
-            (_selectedCategory == 'All' ||
-                item['category'] == _selectedCategory) &&
-            item['name']
-                .toString()
-                .toLowerCase()
-                .contains(_searchQuery.toLowerCase()))
-        .toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+    return DefaultTabController(
+      length: _categories.length,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          elevation: 0,
+          leading: Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.sort_rounded, color: Colors.black),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              );
+            },
+          ),
+          title: Text(
+            'Halo, $_namaToko',
+            style: const TextStyle(color: Colors.black),
+          ),
+          centerTitle: true,
+          bottom: TabBar(
+            onTap: (index) {
+              setState(() {
+                _selectedTabIndex = index;
+              });
+            },
+            isScrollable: true,
+            labelColor: Colors.blue,
+            unselectedLabelColor: Colors.black,
+            indicatorColor: Colors.blue,
+            tabs: _categories.map((category) {
+              return Tab(text: category);
+            }).toList(),
+          ),
         ),
-        title: Text(
-          'Halo, $_namaToko',
-          style: const TextStyle(color: Colors.black),
-        ),
-        centerTitle: true,
-      ),
-      drawer: AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        drawer: AppDrawer(),
+        body: Column(
           children: [
-            // Search Bar
-            TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Cari Barang',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-            const SizedBox(height: 16.0),
-
-            // Category Filter
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: _selectedCategory,
-                  icon: const Icon(Icons.category),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value!;
-                    });
-                  },
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Cari Barang',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
                 ),
               ),
             ),
-            const SizedBox(height: 16.0),
-
-            // Inventory List
             Expanded(
-              child: filteredInventory.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inventory_2_outlined,
-                              size: 64, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Belum ada barang',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
+              child: TabBarView(
+                children: _categories.map((category) {
+                  List<Map<String, dynamic>> filteredInventory =
+                      _inventory.where(
+                    (item) {
+                      return (category == 'All' ||
+                              item['category'] == category) &&
+                          item['name']
+                              .toString()
+                              .toLowerCase()
+                              .contains(_searchQuery.toLowerCase());
+                    },
+                  ).toList();
+
+                  return filteredInventory.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.inventory_2_outlined,
+                                  size: 64, color: Colors.grey[400]),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Belum ada barang',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    )
-                  : GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12.0,
-                        crossAxisSpacing: 12.0,
-                        childAspectRatio: 0.60,
-                      ),
-                      itemCount: filteredInventory.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredInventory[index];
-                        return _buildItemCard(item);
-                      },
-                    ),
+                        )
+                      : GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12.0,
+                            crossAxisSpacing: 12.0,
+                            childAspectRatio: 0.60,
+                          ),
+                          itemCount: filteredInventory.length,
+                          itemBuilder: (context, index) {
+                            final item = filteredInventory[index];
+                            return _buildItemCard(item);
+                          },
+                        );
+                }).toList(),
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TambahBarang(onAddItem: _handleAddItem),
-            ),
-          );
-        },
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add, color: Colors.white),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TambahBarang(onAddItem: _handleAddItem),
+              ),
+            );
+          },
+          backgroundColor: Colors.blue,
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
@@ -253,7 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildItemCard(Map<String, dynamic> item) {
     return GestureDetector(
       onTap: () {
-        // Navigasi ke halaman detail barang
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -277,7 +260,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tambahkan Gambar
             if (item['imagePath'] != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -309,8 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 48,
                 ),
               ),
-            SizedBox(height: 8),
-            // Nama Barang
+            const SizedBox(height: 8),
             Text(
               item['name'],
               style: const TextStyle(
@@ -320,8 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 8),
-            // Kategori
+            const SizedBox(height: 8),
             Text(
               item['category'],
               style: TextStyle(
@@ -331,43 +311,31 @@ class _HomeScreenState extends State<HomeScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 8),
-            // Harga
+            const SizedBox(height: 8),
             Text(
-              'Rp ${item['price'].toStringAsFixed(0)}',
+              'Rp ${item['price'].toString()}',
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: 8),
-            // Status Stok
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${item['stock']}',
+                  item['status'],
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                     color: _getStatusColor(item['status']),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(item['status']).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    item['status'],
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _getStatusColor(item['status']),
-                    ),
+                Text(
+                  '${item['stock']} pcs',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -376,11 +344,5 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 }
