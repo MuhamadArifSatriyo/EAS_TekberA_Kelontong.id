@@ -262,15 +262,12 @@ class _TambahBarangState extends State<TambahBarang> {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _deskripsiController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Deskripsi Barang',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.description),
-                    ),
-                  ),
+                _buildFormField(
+                  label: 'Deskripsi Barang',
+                  controller: _deskripsiController,
+                  icon: Icons.description,
+                  maxLines: 3,
+                ),
                 const SizedBox(height: 32.0),
                 ElevatedButton(
                   onPressed: _saveItem,
