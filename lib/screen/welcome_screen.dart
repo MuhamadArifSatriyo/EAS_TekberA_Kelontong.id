@@ -68,7 +68,6 @@ class WelcomeScreen extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-<<<<<<< HEAD
             Form(
               key: _formKey,
               child: Column(
@@ -163,47 +162,6 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-=======
-            Column(
-              children: [
-                Text(
-                  "Yuk Kelola Kelontongmu Agar Lebih Efisien dan Efektif",
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1,
-                  ),
-                ),
-                SizedBox(height: 80),
-                Material(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(10),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                      child: Text(
-                        "Yuk Mulai",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
->>>>>>> main
             ),
           ],
         ),

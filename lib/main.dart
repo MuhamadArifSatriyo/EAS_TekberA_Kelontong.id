@@ -22,9 +22,11 @@ class MyApp extends StatelessWidget {
 <<<<<<< HEAD
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
 =======
-      theme: ThemeData(scaffoldBackgroundColor: Color.fromARGB(255, 106, 23, 58)),
+      theme:
+          ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 89, 68, 40)),
 >>>>>>> main
-      initialRoute: '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
+      initialRoute:
+          '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
       routes: {
         '/': (context) => WelcomeScreen(), // Welcome screen route
         '/home': (context) => HomeScreen(), // Home screen route

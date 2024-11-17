@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -23,36 +22,26 @@ class _AppDrawerState extends State<AppDrawer> {
     });
   }
 
-=======
-
-class AppDrawer extends StatelessWidget {
->>>>>>> main
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-<<<<<<< HEAD
           DrawerHeader(
             decoration: const BoxDecoration(
-=======
-          const DrawerHeader(
-            decoration: BoxDecoration(
->>>>>>> main
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.blue, // Warna pertama
-                  Colors.purple, // Warna kedua
-                  Colors.orange, // Warna ketiga
+                  Color.fromARGB(255, 223, 164, 16),
+                  Color.fromARGB(255, 167, 87, 31),
+                  Color.fromARGB(255, 93, 41, 5),
                 ],
               ),
             ),
             child: Column(
               children: [
-<<<<<<< HEAD
                 const CircleAvatar(
                   radius: 40,
                   backgroundImage:
@@ -62,17 +51,6 @@ class AppDrawer extends StatelessWidget {
                 Text(
                   _namaToko, // Nama toko dinamis
                   style: const TextStyle(
-=======
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage:
-                      AssetImage('images/profile.png'), // Add your image here
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Toko Madura Habib', // Store name
-                  style: TextStyle(
->>>>>>> main
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -82,7 +60,6 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-<<<<<<< HEAD
             leading: const Icon(Icons.home),
             title: const Text('Home'),
             onTap: () {
@@ -102,27 +79,6 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Tentang Kami'),
             onTap: () {
               Navigator.pushNamed(context, '/aboutUs'); // Rute ke '/aboutUs'
-=======
-            leading: Icon(Icons.home),
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pushNamed(
-                  context, '/home'); // Adjust the route to '/home'
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
-            onTap: () {
-              Navigator.pushNamed(context, '/dashboard');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.info),
-            title: const Text('Tentang Kami'),
-            onTap: () {
-              Navigator.pushNamed(context, '/aboutUs');
->>>>>>> main
             },
           ),
         ],

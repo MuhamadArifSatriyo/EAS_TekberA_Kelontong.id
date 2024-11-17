@@ -35,34 +35,34 @@ class _TambahBarangState extends State<TambahBarang> {
   ];
 
   // The main issue is in the _pickImage function. Replace it with this:
-Future<void> _pickImage(ImageSource source) async {
-  try {
-    final XFile? pickedFile = await _picker.pickImage(
-      source: source,
-      maxWidth: 800,
-      maxHeight: 800,
-      imageQuality: 85,
-    );
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
+      );
 
-    if (pickedFile != null) {
-      if (kIsWeb) {
-        // For web, read the file as bytes and convert to base64
-        final bytes = await pickedFile.readAsBytes();
-        setState(() {
-          _webImageUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-        });
-      } else {
-        setState(() {
-          _imageFile = File(pickedFile.path);
-        });
+      if (pickedFile != null) {
+        if (kIsWeb) {
+          // For web, read the file as bytes and convert to base64
+          final bytes = await pickedFile.readAsBytes();
+          setState(() {
+            _webImageUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+          });
+        } else {
+          setState(() {
+            _imageFile = File(pickedFile.path);
+          });
+        }
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal Mengunggah Gambar: $e')),
+      );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Gagal Mengunggah Gambar: $e')),
-    );
   }
-}
 
   void _showImageSourceDialog() {
     showDialog(
@@ -186,6 +186,7 @@ Future<void> _pickImage(ImageSource source) async {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tambah Barang'),
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -213,12 +214,14 @@ Future<void> _pickImage(ImageSource source) async {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300),
+                    color: const Color.fromARGB(255, 234, 234, 234),
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 102, 99, 99)),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: const Color.fromARGB(255, 76, 70, 70)
+                            .withOpacity(0.1),
                         spreadRadius: 1,
                         blurRadius: 3,
                         offset: const Offset(0, 2),
@@ -244,7 +247,6 @@ Future<void> _pickImage(ImageSource source) async {
                         },
                       ),
                       const SizedBox(height: 16.0),
-
                       DropdownButtonFormField<String>(
                         value: _selectedCategory,
                         decoration: const InputDecoration(
@@ -265,7 +267,6 @@ Future<void> _pickImage(ImageSource source) async {
                         },
                       ),
                       const SizedBox(height: 16.0),
-
                       Row(
                         children: [
                           Expanded(
@@ -303,7 +304,6 @@ Future<void> _pickImage(ImageSource source) async {
                         ],
                       ),
                       const SizedBox(height: 16.0),
-
                       TextFormField(
                         controller: _hargaController,
                         keyboardType: TextInputType.number,
@@ -323,7 +323,6 @@ Future<void> _pickImage(ImageSource source) async {
                         },
                       ),
                       const SizedBox(height: 16.0),
-
                       TextFormField(
                         controller: _deskripsiController,
                         maxLines: 3,
@@ -334,7 +333,6 @@ Future<void> _pickImage(ImageSource source) async {
                         ),
                       ),
                       const SizedBox(height: 24.0),
-
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
