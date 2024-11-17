@@ -64,12 +64,16 @@ class _TambahBarangState extends State<TambahBarang> {
   void _incrementStock() {
     setState(() {
       _stock++;
+      _stokController.text = _stock.toString(); // Update the controller text to reflect stock change
     });
   }
 
   void _decrementStock() {
     setState(() {
-      if (_stock > 0) _stock--;
+      if (_stock > 0) {
+        _stock--;
+        _stokController.text = _stock.toString(); // Update the controller text to reflect stock change
+      }
     });
   }
 
@@ -79,7 +83,7 @@ class _TambahBarangState extends State<TambahBarang> {
         'nama': _namaBarangController.text,
         'kategori': _selectedCategory,
         'stok': _stock,
-        'harga': double.tryParse(_hargaController.text) ?? 0.0,
+        'harga': double.tryParse(_hargaController.text.replaceAll(RegExp('[^0-9.]'), '')) ?? 0.0,
         'deskripsi': _deskripsiController.text,
         'imagePath': kIsWeb ? _webImageUrl : _imageFile?.path,
       };
@@ -169,50 +173,113 @@ class _TambahBarangState extends State<TambahBarang> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                Column(
-                  children: [
-                    Text(
-                      '$_stock',
-                      style: const TextStyle(
-                          fontSize: 32, fontWeight: FontWeight.bold),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle),
-                          color: Colors.red,
-                          onPressed: _decrementStock,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle),
-                          color: Colors.green,
-                          onPressed: _incrementStock,
-                        ),
-                      ],
-                    ),
-                  ],
+                // Merged Stock input and added "Jumlah Stok" label on top
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Jumlah Stok',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle),
+                            color: Colors.red,
+                            onPressed: _decrementStock,
+                          ),
+                          Container(
+                            width: 80,
+                            child: TextFormField(
+                              controller: _stokController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(),
+                              ),
+                              textAlign: TextAlign.center,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Jumlah Stok harus diisi';
+                                }
+                                if (int.tryParse(value) == null) {
+                                  return 'Jumlah Stok harus berupa angka';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                setState(() {
+                                  _stock = int.tryParse(value) ?? 0;
+                                });
+                              },
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add_circle),
+                            color: Colors.green,
+                            onPressed: _incrementStock,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16.0),
-                _buildFormField(
-                  label: 'Harga (Rp)',
-                  controller: _hargaController,
-                  icon: Icons.attach_money,
-                  isNumber: true,
+                // Harga input with dollar sign icon
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Harga',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      TextFormField(
+                        controller: _hargaController,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.attach_money), // Added dollar sign icon
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Harga harus diisi';
+                          if (double.tryParse(value.replaceAll(RegExp('[^0-9.]'), '')) == null)
+                            return 'Harga harus berupa angka';
+                          return null;
+                        },
+                        onChanged: (value) {
+                          // No currency formatting logic anymore
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16.0),
-                _buildFormField(
-                  label: 'Deskripsi Barang',
-                  controller: _deskripsiController,
-                  icon: Icons.description,
-                  isMultiLine: true,
-                ),
-                const SizedBox(height: 24.0),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _saveItem,
-                    child: const Text('Simpan Barang'),
+                  TextFormField(
+                    controller: _deskripsiController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Deskripsi Barang',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.description),
+                    ),
+                  ),
+                const SizedBox(height: 32.0),
+                ElevatedButton(
+                  onPressed: _saveItem,
+                  child: const Text('Simpan Barang'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: Colors.green, // Updated property name
+                    foregroundColor: Colors.white, // Updated property name
+                    textStyle: const TextStyle(fontSize: 16),
                   ),
                 ),
               ],
@@ -227,24 +294,22 @@ class _TambahBarangState extends State<TambahBarang> {
     required String label,
     required TextEditingController controller,
     required IconData icon,
-    bool isNumber = false,
-    bool isMultiLine = false,
+    int maxLines = 1,
   }) {
     return TextFormField(
       controller: controller,
-      keyboardType:
-          isNumber ? TextInputType.number : isMultiLine ? TextInputType.multiline : TextInputType.text,
-      maxLines: isMultiLine ? null : 1,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
         labelText: label,
-        border: const OutlineInputBorder(),
+        border: OutlineInputBorder(),
         prefixIcon: Icon(icon),
       ),
+      maxLines: maxLines,
       validator: (value) {
-        if (value == null || value.isEmpty) return '$label harus diisi';
-        if (isNumber && double.tryParse(value) == null) return '$label harus berupa angka';
+        if (value == null || value.isEmpty) {
+          return '$label harus diisi';
+        }
         return null;
       },
     );
