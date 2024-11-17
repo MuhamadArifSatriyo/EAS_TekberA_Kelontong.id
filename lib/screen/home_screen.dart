@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   String _selectedCategory = 'All';
   String _searchQuery = '';
+  String _namaToko = 'Toko Anda';
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -34,29 +35,37 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadInventory();
+    _loadNamaToko(); 
   }
 
-  // Load inventory from text file
+  // Load Nama Toko dari SharedPreferences
+  Future<void> _loadNamaToko() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _namaToko = prefs.getString('namaToko') ?? 'Toko Anda';
+    });
+    debugPrint('Nama Toko yang Dimuat: $_namaToko'); // Debugging
+  }
+
+  // Load inventory dari text file
   Future<void> _loadInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
 
     if (await file.exists()) {
       final contents = await file.readAsString();
-      List<dynamic> jsonData =
-          json.decode(contents); // Decode the saved JSON data
+      List<dynamic> jsonData = json.decode(contents);
       setState(() {
         _inventory = List<Map<String, dynamic>>.from(jsonData);
       });
     }
   }
 
-  // Save inventory to a text file
+  // Simpan inventory ke text file
   Future<void> _saveInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
 
-    // Encode the inventory list to JSON
     String jsonData = json.encode(_inventory);
     await file.writeAsString(jsonData);
   }
@@ -95,6 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk debugging SharedPreferences
+  Future<void> printSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredInventory = _inventory
@@ -116,14 +131,13 @@ class _HomeScreenState extends State<HomeScreen> {
             return IconButton(
               icon: const Icon(Icons.menu, color: Colors.black),
               onPressed: () {
-                Scaffold.of(context)
-                    .openDrawer(); // Open the drawer when menu is tapped
+                Scaffold.of(context).openDrawer();
               },
             );
           },
         ),
-        title: const Text(
-          'Inventory Manager',
+        title: Text(
+          'Halo, $_namaToko',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,

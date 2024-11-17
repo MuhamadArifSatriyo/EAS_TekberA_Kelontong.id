@@ -1,14 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
+  @override
+  _AppDrawerState createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  String _namaToko = "Toko Madura Habib"; // Default value
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNamaToko();
+  }
+
+  Future<void> _loadNamaToko() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _namaToko = prefs.getString('namaToko') ?? _namaToko;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+          DrawerHeader(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -21,15 +42,15 @@ class AppDrawer extends StatelessWidget {
             ),
             child: Column(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 40,
                   backgroundImage:
-                      AssetImage('images/profile.png'), // Add your image here
+                      AssetImage('images/profile.png'), // Gambar profil
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
-                  'Toko Madura Habib', // Store name
-                  style: TextStyle(
+                  _namaToko, // Nama toko dinamis
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -39,25 +60,25 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.home),
+            leading: const Icon(Icons.home),
             title: const Text('Home'),
             onTap: () {
-              Navigator.pushNamed(
-                  context, '/home'); // Adjust the route to '/home'
+              Navigator.pushNamed(context, '/home'); // Rute ke '/home'
             },
           ),
           ListTile(
-            leading: Icon(Icons.dashboard),
+            leading: const Icon(Icons.dashboard),
             title: const Text('Dashboard'),
             onTap: () {
-              Navigator.pushNamed(context, '/dashboard');
+              Navigator.pushNamed(
+                  context, '/dashboard'); // Rute ke '/dashboard'
             },
           ),
           ListTile(
-            leading: Icon(Icons.info),
+            leading: const Icon(Icons.info),
             title: const Text('Tentang Kami'),
             onTap: () {
-              Navigator.pushNamed(context, '/aboutUs');
+              Navigator.pushNamed(context, '/aboutUs'); // Rute ke '/aboutUs'
             },
           ),
         ],

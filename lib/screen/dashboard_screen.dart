@@ -6,12 +6,12 @@ class DashboardScreen extends StatelessWidget {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('About Me'),
+        title: Text('Dashboard'),
       ),
       body: Center(
         child: Text(
-          'About Me',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          'This is a dashboard about our sales since last year',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
     );
