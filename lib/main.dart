@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
       initialRoute:
-          '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
+        '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
       routes: {
         '/': (context) => WelcomeScreen(), // Welcome screen route
         '/home': (context) => HomeScreen(), // Home screen route
