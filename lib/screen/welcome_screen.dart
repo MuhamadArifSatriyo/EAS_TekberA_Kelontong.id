@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+<<<<<<< HEAD
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screen/home_screen.dart';
 
@@ -39,6 +40,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
+=======
+import '../screen/home_screen.dart';
+
+class WelcomeScreen extends StatelessWidget {
+>>>>>>> main
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -62,6 +68,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 color: Colors.white,
               ),
             ),
+<<<<<<< HEAD
             Form(
               key: _formKey,
               child: Column(
@@ -156,6 +163,47 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                 ),
               ),
+=======
+            Column(
+              children: [
+                Text(
+                  "Yuk Kelola Kelontongmu Agar Lebih Efisien dan Efektif",
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 1,
+                  ),
+                ),
+                SizedBox(height: 80),
+                Material(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(10),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                      child: Text(
+                        "Yuk Mulai",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+>>>>>>> main
             ),
           ],
         ),

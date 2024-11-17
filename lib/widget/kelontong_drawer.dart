@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -22,14 +23,23 @@ class _AppDrawerState extends State<AppDrawer> {
     });
   }
 
+=======
+
+class AppDrawer extends StatelessWidget {
+>>>>>>> main
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
+<<<<<<< HEAD
           DrawerHeader(
             decoration: const BoxDecoration(
+=======
+          const DrawerHeader(
+            decoration: BoxDecoration(
+>>>>>>> main
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -42,6 +52,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             child: Column(
               children: [
+<<<<<<< HEAD
                 const CircleAvatar(
                   radius: 40,
                   backgroundImage:
@@ -51,6 +62,17 @@ class _AppDrawerState extends State<AppDrawer> {
                 Text(
                   _namaToko, // Nama toko dinamis
                   style: const TextStyle(
+=======
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage:
+                      AssetImage('images/profile.png'), // Add your image here
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Toko Madura Habib', // Store name
+                  style: TextStyle(
+>>>>>>> main
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -60,6 +82,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           ListTile(
+<<<<<<< HEAD
             leading: const Icon(Icons.home),
             title: const Text('Home'),
             onTap: () {
@@ -79,6 +102,27 @@ class _AppDrawerState extends State<AppDrawer> {
             title: const Text('Tentang Kami'),
             onTap: () {
               Navigator.pushNamed(context, '/aboutUs'); // Rute ke '/aboutUs'
+=======
+            leading: Icon(Icons.home),
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.pushNamed(
+                  context, '/home'); // Adjust the route to '/home'
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.dashboard),
+            title: const Text('Dashboard'),
+            onTap: () {
+              Navigator.pushNamed(context, '/dashboard');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: const Text('Tentang Kami'),
+            onTap: () {
+              Navigator.pushNamed(context, '/aboutUs');
+>>>>>>> main
             },
           ),
         ],
