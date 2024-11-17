@@ -4,8 +4,15 @@ import 'dart:io';
 
 class DetailBarang extends StatelessWidget {
   final Map<String, dynamic> item;
+  final Function(Map<String, dynamic>) onEditItem;
+  final Function(Map<String, dynamic>) onDeleteItem;
 
-  const DetailBarang({Key? key, required this.item}) : super(key: key);
+  const DetailBarang({
+    Key? key,
+    required this.item,
+    required this.onDeleteItem,
+    required this.onEditItem,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +123,60 @@ class DetailBarang extends StatelessWidget {
                     Text(
                       item['description'] ?? 'Tidak ada deskripsi.',
                       style: const TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 40),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // Arahkan ke halaman edit
+                            onEditItem(item);
+                          },
+                          icon: const Icon(Icons.edit),
+                          label: const Text('Edit Barang'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                            icon: const Icon(Icons.delete),
+                            label: const Text('Hapus Barang'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            onPressed: () {
+                              // Konfirmasi hapus
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Hapus Barang'),
+                                  content: const Text(
+                                      'Apakah Anda yakin ingin menghapus barang ini?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context); // Tutup dialog
+                                      },
+                                      child: const Text('Batal'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context); // Tutup dialog
+                                        onDeleteItem(item); // Hapus barang
+                                        Navigator.pop(
+                                            context); // Kembali ke daftar
+                                      },
+                                      child: const Text(
+                                        'Hapus',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                      ],
                     ),
                   ]),
             ),

@@ -70,6 +70,25 @@ class _HomeScreenState extends State<HomeScreen> {
     await file.writeAsString(jsonData);
   }
 
+  void _onEditItem(Map<String, dynamic> updatedItem) {
+    setState(() {
+      final index =
+          _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
+      if (index != -1) {
+        _inventory[index] = updatedItem; // Update item
+      }
+    });
+    _saveInventory(); // Simpan data yang telah diperbarui
+  }
+
+  void _onDeleteItem(Map<String, dynamic> deletedItem) {
+    setState(() {
+      _inventory.removeWhere(
+          (item) => item['name'] == deletedItem['name']); // Hapus item
+    });
+    _saveInventory(); // Simpan data setelah dihapus
+  }
+
   void _handleAddItem(Map<String, dynamic> itemData) {
     setState(() {
       _inventory.add({
@@ -143,11 +162,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         drawer: AppDrawer(),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
                 controller: _searchController,
                 onChanged: (value) {
                   setState(() {
@@ -164,59 +183,60 @@ class _HomeScreenState extends State<HomeScreen> {
                   fillColor: Colors.grey[200],
                 ),
               ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: _categories.map((category) {
-                  List<Map<String, dynamic>> filteredInventory =
-                      _inventory.where(
-                    (item) {
-                      return (category == 'All' ||
-                              item['category'] == category) &&
-                          item['name']
-                              .toString()
-                              .toLowerCase()
-                              .contains(_searchQuery.toLowerCase());
-                    },
-                  ).toList();
+              SizedBox(height: 16.0),
+              Expanded(
+                child: TabBarView(
+                  children: _categories.map((category) {
+                    List<Map<String, dynamic>> filteredInventory =
+                        _inventory.where(
+                      (item) {
+                        return (category == 'All' ||
+                                item['category'] == category) &&
+                            item['name']
+                                .toString()
+                                .toLowerCase()
+                                .contains(_searchQuery.toLowerCase());
+                      },
+                    ).toList();
 
-                  return filteredInventory.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.inventory_2_outlined,
-                                  size: 64, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Belum ada barang',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
+                    return filteredInventory.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.inventory_2_outlined,
+                                    size: 64, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Belum ada barang',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12.0,
-                            crossAxisSpacing: 12.0,
-                            childAspectRatio: 0.60,
-                          ),
-                          itemCount: filteredInventory.length,
-                          itemBuilder: (context, index) {
-                            final item = filteredInventory[index];
-                            return _buildItemCard(item);
-                          },
-                        );
-                }).toList(),
+                              ],
+                            ),
+                          )
+                        : GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12.0,
+                              crossAxisSpacing: 12.0,
+                              childAspectRatio: 0.60,
+                            ),
+                            itemCount: filteredInventory.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredInventory[index];
+                              return _buildItemCard(item);
+                            },
+                          );
+                  }).toList(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -240,7 +260,11 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailBarang(item: item),
+            builder: (context) => DetailBarang(
+              item: item,
+              onEditItem: _onEditItem,
+              onDeleteItem: _onDeleteItem,
+            ),
           ),
         );
       },
