@@ -123,6 +123,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk debugging SharedPreferences
+  Future<void> printSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
