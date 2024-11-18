@@ -30,8 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     'Lainnya',
   ];
 
-  int _selectedTabIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -170,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
           bottom: TabBar(
             onTap: (index) {
               setState(() {
-                _selectedTabIndex = index;
               });
             },
             isScrollable: true,
