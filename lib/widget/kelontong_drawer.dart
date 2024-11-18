@@ -1,87 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class AppDrawer extends StatefulWidget {
-  @override
-  _AppDrawerState createState() => _AppDrawerState();
-}
+class AppDrawer extends StatelessWidget {
+  final String namaToko; // Accept store name as a parameter
 
-class _AppDrawerState extends State<AppDrawer> {
-  String _namaToko = "Toko Madura Habib"; // Default value
-
-  @override
-  void initState() {
-    super.initState();
-    _loadNamaToko();
-  }
-
-  Future<void> _loadNamaToko() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _namaToko = prefs.getString('namaToko') ?? _namaToko;
-    });
-  }
+  const AppDrawer({Key? key, required this.namaToko}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color.fromARGB(255, 223, 164, 16),
-                  Color.fromARGB(255, 167, 87, 31),
-                  Color.fromARGB(255, 93, 41, 5),
-                ],
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.4, // 40% of screen width
+      child: Drawer(
+        child: Material(
+          color: Colors.grey[300], // Match the background with the app theme
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                margin: EdgeInsets.zero, // Remove extra margin
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundImage:
+                          AssetImage('images/profile.png'), // Profile image
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      namaToko, // Use the dynamic store name
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                const CircleAvatar(
-                  radius: 40,
-                  backgroundImage:
-                      AssetImage('images/profile.png'), // Gambar profil
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _namaToko, // Nama toko dinamis
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                leading: const Icon(Icons.home),
+                title: const Text('Home'),
+                onTap: () {
+                  Navigator.pushNamed(context, '/home'); // Route to '/home'
+                },
+              ),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                leading: const Icon(Icons.dashboard),
+                title: const Text('Dashboard'),
+                onTap: () {
+                  Navigator.pushNamed(context, '/dashboard'); // Route to '/dashboard'
+                },
+              ),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                leading: const Icon(Icons.info),
+                title: const Text('Tentang Kami'),
+                onTap: () {
+                  Navigator.pushNamed(context, '/aboutUs'); // Route to '/aboutUs'
+                },
+              ),
+            ],
           ),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pushNamed(context, '/home'); // Rute ke '/home'
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
-            onTap: () {
-              Navigator.pushNamed(
-                  context, '/dashboard'); // Rute ke '/dashboard'
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.info),
-            title: const Text('Tentang Kami'),
-            onTap: () {
-              Navigator.pushNamed(context, '/aboutUs'); // Rute ke '/aboutUs'
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

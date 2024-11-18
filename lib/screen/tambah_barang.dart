@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
-// import 'dart:html' as html;
 import 'dart:convert';
 
 class TambahBarang extends StatefulWidget {
@@ -34,7 +33,6 @@ class _TambahBarangState extends State<TambahBarang> {
     'Lainnya',
   ];
 
-  // The main issue is in the _pickImage function. Replace it with this:
   Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
@@ -46,7 +44,6 @@ class _TambahBarangState extends State<TambahBarang> {
 
       if (pickedFile != null) {
         if (kIsWeb) {
-          // For web, read the file as bytes and convert to base64
           final bytes = await pickedFile.readAsBytes();
           setState(() {
             _webImageUrl = 'data:image/jpeg;base64,${base64Encode(bytes)}';
@@ -64,46 +61,20 @@ class _TambahBarangState extends State<TambahBarang> {
     }
   }
 
-  void _showImageSourceDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Pilih Sumber Gambar'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (!kIsWeb) // Only show camera option for mobile
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: const Text('Kamera'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _pickImage(ImageSource.camera);
-                  },
-                ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Galeri'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  void _incrementStock() {
+    setState(() {
+      _stock++;
+      _stokController.text = _stock.toString(); // Update the controller text to reflect stock change
+    });
   }
 
-  @override
-  void dispose() {
-    _namaBarangController.dispose();
-    _stokController.dispose();
-    _hargaController.dispose();
-    _deskripsiController.dispose();
-    super.dispose();
+  void _decrementStock() {
+    setState(() {
+      if (_stock > 0) {
+        _stock--;
+        _stokController.text = _stock.toString(); // Update the controller text to reflect stock change
+      }
+    });
   }
 
   void _saveItem() {
@@ -112,7 +83,7 @@ class _TambahBarangState extends State<TambahBarang> {
         'nama': _namaBarangController.text,
         'kategori': _selectedCategory,
         'stok': _stock,
-        'harga': double.tryParse(_hargaController.text) ?? 0.0,
+        'harga': double.tryParse(_hargaController.text.replaceAll(RegExp('[^0-9.]'), '')) ?? 0.0,
         'deskripsi': _deskripsiController.text,
         'imagePath': kIsWeb ? _webImageUrl : _imageFile?.path,
       };
@@ -122,65 +93,6 @@ class _TambahBarangState extends State<TambahBarang> {
     }
   }
 
-  void _incrementStock() {
-    setState(() {
-      _stock++;
-      _stokController.text = _stock.toString();
-    });
-  }
-
-  void _decrementStock() {
-    setState(() {
-      if (_stock > 0) {
-        _stock--;
-        _stokController.text = _stock.toString();
-      }
-    });
-  }
-
-  Widget _buildImagePreview() {
-    if (kIsWeb) {
-      if (_webImageUrl != null) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            _webImageUrl!,
-            fit: BoxFit.cover,
-          ),
-        );
-      }
-    } else {
-      if (_imageFile != null) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.file(
-            _imageFile!,
-            fit: BoxFit.cover,
-          ),
-        );
-      }
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Icon(
-          Icons.add_photo_alternate,
-          size: 48,
-          color: Colors.grey,
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Tambah Foto Barang',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,6 +100,7 @@ class _TambahBarangState extends State<TambahBarang> {
         title: const Text('Tambah Barang'),
         backgroundColor: Colors.white,
         elevation: 0,
+        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -196,158 +109,174 @@ class _TambahBarangState extends State<TambahBarang> {
             key: _formKey,
             child: Column(
               children: [
-                // Image Upload Section
                 GestureDetector(
-                  onTap: _showImageSourceDialog,
+                  onTap: () => _pickImage(ImageSource.gallery),
                   child: Container(
                     width: double.infinity,
                     height: 200,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(color: Colors.grey.shade400, width: 2), // Added border
                     ),
-                    child: _buildImagePreview(),
+                    child: _imageFile != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(_imageFile!, fit: BoxFit.cover),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.add,
+                                size: 48, // Added "+" icon
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Tambah Foto Barang',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
                 const SizedBox(height: 16.0),
-
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 234, 234, 234),
-                    border: Border.all(
-                        color: const Color.fromARGB(255, 102, 99, 99)),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color.fromARGB(255, 76, 70, 70)
-                            .withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                _buildFormField(
+                  label: 'Nama Barang',
+                  controller: _namaBarangController,
+                  icon: Icons.inventory,
+                ),
+                const SizedBox(height: 16.0),
+                DropdownButtonFormField<String>(
+                  value: _selectedCategory,
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: 'Kategori Barang',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.category),
                   ),
-                  padding: const EdgeInsets.all(16),
+                  items: _categories
+                      .map((category) => DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                // Merged Stock input and added "Jumlah Stok" label on top
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextFormField(
-                        controller: _namaBarangController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nama Barang',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.inventory),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Nama barang harus diisi';
-                          }
-                          return null;
-                        },
+                      const Text(
+                        'Jumlah Stok',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 16.0),
-                      DropdownButtonFormField<String>(
-                        value: _selectedCategory,
-                        decoration: const InputDecoration(
-                          labelText: 'Kategori Barang',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.category),
-                        ),
-                        items: _categories.map((category) {
-                          return DropdownMenuItem(
-                            value: category,
-                            child: Text(category),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedCategory = value!;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 16.0),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle),
+                            color: Colors.red,
+                            onPressed: _decrementStock,
+                          ),
+                          Container(
+                            width: 80,
                             child: TextFormField(
                               controller: _stokController,
                               keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
-                                labelText: 'Stok Barang',
+                                filled: true,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.inventory_2),
                               ),
+                              textAlign: TextAlign.center,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Stok harus diisi';
+                                  return 'Jumlah Stok harus diisi';
+                                }
+                                if (int.tryParse(value) == null) {
+                                  return 'Jumlah Stok harus berupa angka';
                                 }
                                 return null;
                               },
+                              onChanged: (value) {
+                                setState(() {
+                                  _stock = int.tryParse(value) ?? 0;
+                                });
+                              },
                             ),
                           ),
-                          const SizedBox(width: 8.0),
-                          Column(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.add_circle),
-                                onPressed: _incrementStock,
-                                color: Colors.green,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.remove_circle),
-                                onPressed: _decrementStock,
-                                color: Colors.red,
-                              ),
-                            ],
+                          IconButton(
+                            icon: const Icon(Icons.add_circle),
+                            color: Colors.green,
+                            onPressed: _incrementStock,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16.0),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                // Harga input with dollar sign icon
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Harga',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                       TextFormField(
                         controller: _hargaController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Harga (Rp)',
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.attach_money),
+                          prefixIcon: const Icon(Icons.attach_money), // Added dollar sign icon
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Harga harus diisi';
-                          }
-                          if (double.tryParse(value) == null) {
+                          if (value == null || value.isEmpty) return 'Harga harus diisi';
+                          if (double.tryParse(value.replaceAll(RegExp('[^0-9.]'), '')) == null)
                             return 'Harga harus berupa angka';
-                          }
                           return null;
                         },
-                      ),
-                      const SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: _deskripsiController,
-                        maxLines: 3,
-                        decoration: const InputDecoration(
-                          labelText: 'Deskripsi Barang',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.description),
-                        ),
-                      ),
-                      const SizedBox(height: 24.0),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _saveItem,
-                          icon: const Icon(Icons.save),
-                          label: const Text('Simpan Barang'),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
+                        onChanged: (value) {
+                          // No currency formatting logic anymore
+                        },
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                _buildFormField(
+                  label: 'Deskripsi Barang',
+                  controller: _deskripsiController,
+                  icon: Icons.description,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 32.0),
+                ElevatedButton(
+                  onPressed: _saveItem,
+                  child: const Text('Simpan Barang'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                    backgroundColor: Colors.green, // Updated property name
+                    foregroundColor: Colors.white, // Updated property name
+                    textStyle: const TextStyle(fontSize: 16),
                   ),
                 ),
               ],
@@ -355,6 +284,31 @@ class _TambahBarangState extends State<TambahBarang> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFormField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white,
+        labelText: label,
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(icon),
+      ),
+      maxLines: maxLines,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return '$label harus diisi';
+        }
+        return null;
+      },
     );
   }
 }

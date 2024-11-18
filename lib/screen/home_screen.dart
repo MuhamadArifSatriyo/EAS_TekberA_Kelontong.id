@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   String _searchQuery = '';
-  String _namaToko = 'Toko Anda'; // Variabel untuk menyimpan nama toko
+  String _namaToko = 'Toko Anda'; // Variable to store store name
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNamaToko();
   }
 
-  // Load Nama Toko dari SharedPreferences
+  // Load store name from SharedPreferences
   Future<void> _loadNamaToko() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Load inventory dari text file
+  // Load inventory from text file
   Future<void> _loadInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
@@ -61,13 +61,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Simpan inventory ke text file
+  // Save inventory to text file
   Future<void> _saveInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
 
     String jsonData = json.encode(_inventory);
     await file.writeAsString(jsonData);
+  }
+
+  void _onEditItem(Map<String, dynamic> updatedItem) {
+    setState(() {
+      final index =
+          _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
+      if (index != -1) {
+        _inventory[index] = updatedItem; // Update item
+      }
+    });
+    _saveInventory(); // Simpan data yang telah diperbarui
+  }
+
+  void _onDeleteItem(Map<String, dynamic> deletedItem) {
+    setState(() {
+      _inventory.removeWhere(
+          (item) => item['name'] == deletedItem['name']); // Hapus item
+    });
+    _saveInventory(); // Simpan data setelah dihapus
   }
 
   void _handleAddItem(Map<String, dynamic> itemData) {
@@ -128,9 +147,24 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          title: Text(
-            'Halo, $_namaToko',
-            style: const TextStyle(color: Colors.black),
+          title: Text.rich(
+            TextSpan(
+              text: 'Halo, ', // The "Halo" part
+              style: const TextStyle(
+                color: Colors.blue, // Blue color for "Halo"
+                fontWeight: FontWeight.bold, // Bold text for "Halo"
+              ),
+              children: [
+                TextSpan(
+                  text: '$_namaToko', // Store name part
+                  style: const TextStyle(
+                    color: Colors.black, // Black color for store name
+                    fontWeight:
+                        FontWeight.normal, // Normal weight for store name
+                  ),
+                ),
+              ],
+            ),
           ),
           centerTitle: true,
           bottom: TabBar(
@@ -148,12 +182,12 @@ class _HomeScreenState extends State<HomeScreen> {
             }).toList(),
           ),
         ),
-        drawer: AppDrawer(),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
+        drawer: AppDrawer(namaToko: _namaToko),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
                 controller: _searchController,
                 onChanged: (value) {
                   setState(() {
@@ -170,59 +204,60 @@ class _HomeScreenState extends State<HomeScreen> {
                   fillColor: Colors.grey[200],
                 ),
               ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: _categories.map((category) {
-                  List<Map<String, dynamic>> filteredInventory =
-                      _inventory.where(
-                    (item) {
-                      return (category == 'All' ||
-                              item['category'] == category) &&
-                          item['name']
-                              .toString()
-                              .toLowerCase()
-                              .contains(_searchQuery.toLowerCase());
-                    },
-                  ).toList();
+              const SizedBox(height: 16.0),
+              Expanded(
+                child: TabBarView(
+                  children: _categories.map((category) {
+                    List<Map<String, dynamic>> filteredInventory =
+                        _inventory.where(
+                      (item) {
+                        return (category == 'All' ||
+                                item['category'] == category) &&
+                            item['name']
+                                .toString()
+                                .toLowerCase()
+                                .contains(_searchQuery.toLowerCase());
+                      },
+                    ).toList();
 
-                  return filteredInventory.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.inventory_2_outlined,
-                                  size: 64, color: Colors.grey[400]),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Belum ada barang',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
+                    return filteredInventory.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.inventory_2_outlined,
+                                    size: 64, color: Colors.grey[400]),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Belum ada barang',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12.0,
-                            crossAxisSpacing: 12.0,
-                            childAspectRatio: 0.60,
-                          ),
-                          itemCount: filteredInventory.length,
-                          itemBuilder: (context, index) {
-                            final item = filteredInventory[index];
-                            return _buildItemCard(item);
-                          },
-                        );
-                }).toList(),
+                              ],
+                            ),
+                          )
+                        : GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12.0,
+                              crossAxisSpacing: 12.0,
+                              childAspectRatio: 0.60,
+                            ),
+                            itemCount: filteredInventory.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredInventory[index];
+                              return _buildItemCard(item);
+                            },
+                          );
+                  }).toList(),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -246,7 +281,11 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailBarang(item: item),
+            builder: (context) => DetailBarang(
+              item: item,
+              onEditItem: _onEditItem,
+              onDeleteItem: _onDeleteItem,
+            ),
           ),
         );
       },
@@ -322,29 +361,24 @@ class _HomeScreenState extends State<HomeScreen> {
               'Rp ${item['price'].toString()}',
               style: const TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  item['status'],
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _getStatusColor(item['status']),
-                    fontWeight: FontWeight.w600,
-                  ),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              decoration: BoxDecoration(
+                color: _getStatusColor(item['status']),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Text(
+                item['status'],
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
                 ),
-                Text(
-                  '${item['stock']} pcs',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),

@@ -10,7 +10,7 @@ class AboutUsScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'Kelontong.ID merupakan aplikasi manajemen inventory yang bertujuan untuk mencatat ketersediaan produk pada toko pengguna.',
+          'Kelontong.ID merupakan aplikasi manajemen inventaris yang bertujuan untuk mencatat ketersediaan produk pada toko pengguna.',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
