@@ -8,7 +8,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.4, // 40% of screen width
+      width: MediaQuery.of(context).size.width * 0.6, // 60% of screen width
       child: Drawer(
         child: Material(
           color: Colors.grey[300], // Match the background with the app theme
@@ -51,7 +51,8 @@ class AppDrawer extends StatelessWidget {
                 leading: const Icon(Icons.dashboard),
                 title: const Text('Dashboard'),
                 onTap: () {
-                  Navigator.pushNamed(context, '/dashboard'); // Route to '/dashboard'
+                  Navigator.pushNamed(
+                      context, '/dashboard'); // Route to '/dashboard'
                 },
               ),
               ListTile(
@@ -59,7 +60,8 @@ class AppDrawer extends StatelessWidget {
                 leading: const Icon(Icons.info),
                 title: const Text('Tentang Kami'),
                 onTap: () {
-                  Navigator.pushNamed(context, '/aboutUs'); // Route to '/aboutUs'
+                  Navigator.pushNamed(
+                      context, '/aboutUs'); // Route to '/aboutUs'
                 },
               ),
             ],
