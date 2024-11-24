@@ -68,21 +68,22 @@ class _HomeScreenState extends State<HomeScreen> {
     await file.writeAsString(jsonData);
   }
 
-  void _onEditItem(Map<String, dynamic> updatedItem) {
+  void _onEditItem(Map<String, dynamic> itemData) {
     setState(() {
       final index =
-          _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
+          _inventory.indexWhere((item) => item['name'] == itemData['name']);
       if (index != -1) {
-        _inventory[index] = updatedItem; // Update item
+        _inventory[index] = itemData; // Update item
       }
     });
     _saveInventory(); // Simpan data yang telah diperbarui
   }
 
-  void _onDeleteItem(Map<String, dynamic> deletedItem) {
+  void _onDeleteItem(Map<String, dynamic> item) {
     setState(() {
       _inventory.removeWhere(
-          (item) => item['name'] == deletedItem['name']); // Hapus item
+        (existingItem) => existingItem['name'] == item['name']
+      ); // Hapus item
     });
     _saveInventory(); // Simpan data setelah dihapus
   }
@@ -147,18 +148,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           title: Text.rich(
             TextSpan(
-              text: 'Halo, ', // The "Halo" part
+              text: 'Halo, ', 
               style: const TextStyle(
-                color: Colors.blue, // Blue color for "Halo"
-                fontWeight: FontWeight.bold, // Bold text for "Halo"
+                fontWeight: FontWeight.bold, 
               ),
               children: [
                 TextSpan(
-                  text: '$_namaToko', // Store name part
+                  text: '$_namaToko', 
                   style: const TextStyle(
-                    color: Colors.black, // Black color for store name
+                    color: Colors.black, 
                     fontWeight:
-                        FontWeight.normal, // Normal weight for store name
+                        FontWeight.normal, 
                   ),
                 ),
               ],
