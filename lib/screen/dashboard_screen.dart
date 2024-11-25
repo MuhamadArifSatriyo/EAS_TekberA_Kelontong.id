@@ -6,7 +6,6 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
-        backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
         child: Padding(
