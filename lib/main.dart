@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => WelcomeScreen(), // Welcome screen route
         '/home': (context) => HomeScreen(), // Home screen route
         '/dashboard': (context) => DashboardScreen(), // Dashboard screen route
-        '/aboutUs': (context) => AboutUsScreen(), // AboutUs screen route
+        '/aboutUs': (context) => AboutUsScreen() // AboutUs screen route
       },
     );
   }
