@@ -103,21 +103,6 @@ void _handleAddItem(Map<String, dynamic> itemData) {
     _saveInventory();
   }
 
-  void _handleAddItem(Map<String, dynamic> itemData) {
-    setState(() {
-      _inventory.add({
-        'name': itemData['nama'],
-        'category': itemData['kategori'],
-        'stock': itemData['stok'],
-        'price': itemData['harga'],
-        'description': itemData['deskripsi'],
-        'status': _getStockStatus(itemData['stok']),
-        'imagePath': itemData['imagePath'],
-      });
-    });
-    _saveInventory();
-  }
-
   String _getStockStatus(int stock) {
     if (stock > 10) return 'Stok Aman';
     if (stock > 0) return 'Stok Menipis';
