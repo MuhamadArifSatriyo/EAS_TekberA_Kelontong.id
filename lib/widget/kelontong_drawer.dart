@@ -51,7 +51,8 @@ class AppDrawer extends StatelessWidget {
                 leading: const Icon(Icons.dashboard),
                 title: const Text('Dashboard'),
                 onTap: () {
-                  Navigator.pushNamed(context, '/dashboard'); // Route to '/dashboard'
+                  Navigator.pushNamed(
+                      context, '/dashboard'); // Route to '/dashboard'
                 },
               ),
               ListTile(
@@ -59,7 +60,8 @@ class AppDrawer extends StatelessWidget {
                 leading: const Icon(Icons.info),
                 title: const Text('Tentang Kami'),
                 onTap: () {
-                  Navigator.pushNamed(context, '/aboutUs'); // Route to '/aboutUs'
+                  Navigator.pushNamed(
+                      context, '/aboutUs'); // Route to '/aboutUs'
                 },
               ),
             ],
