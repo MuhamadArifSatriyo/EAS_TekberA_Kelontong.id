@@ -88,6 +88,21 @@ class _HomeScreenState extends State<HomeScreen> {
     _saveInventory(); // Simpan data setelah dihapus
   }
 
+void _handleAddItem(Map<String, dynamic> itemData) {
+    setState(() {
+      _inventory.add({
+        'name': itemData['nama'],
+        'category': itemData['kategori'],
+        'stock': itemData['stok'],
+        'price': itemData['harga'],
+        'description': itemData['deskripsi'],
+        'status': _getStockStatus(itemData['stok']),
+        'imagePath': itemData['imagePath'],
+      });
+    });
+    _saveInventory();
+  }
+
   void _handleAddItem(Map<String, dynamic> itemData) {
     setState(() {
       _inventory.add({
@@ -158,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: const TextStyle(
                     color: Colors.black, 
                     fontWeight:
-                        FontWeight.normal, 
+                        FontWeight.normal,
                   ),
                 ),
               ],
