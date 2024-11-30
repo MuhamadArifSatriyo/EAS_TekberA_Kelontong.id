@@ -114,6 +114,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildTextInput({
     required TextEditingController controller,
