@@ -8,7 +8,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.4, // 40% of screen width
+      width: MediaQuery.of(context).size.width * 0.6, // 60% of screen width
       child: Drawer(
         child: Material(
           color: Colors.grey[300], // Match the background with the app theme
