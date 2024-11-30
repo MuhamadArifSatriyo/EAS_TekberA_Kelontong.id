@@ -38,6 +38,7 @@ dependencies:
   shared_preferences: ^2.3.3
   image_picker: ^1.1.2
   fl_chart: ^0.55.2
+  font_awesome_flutter: ^10.5.1
 
 dev_dependencies:
   flutter_test:
