@@ -6,8 +6,9 @@ import 'dart:convert';
 
 class TambahBarang extends StatefulWidget {
   final Function(Map<String, dynamic>) onAddItem;
+  final Map<String, dynamic>? item;
 
-  const TambahBarang({Key? key, required this.onAddItem}) : super(key: key);
+  const TambahBarang({Key? key, required this.onAddItem, this.item}) : super(key: key);
 
   @override
   _TambahBarangState createState() => _TambahBarangState();
@@ -77,6 +78,29 @@ class _TambahBarangState extends State<TambahBarang> {
     });
   }
 
+   @override
+  void initState() {
+    super.initState();
+
+    // Jika item tersedia, isi form dengan nilai awal
+    if (widget.item != null) {
+      _namaBarangController.text = widget.item!['nama'] ?? '';
+      _selectedCategory = widget.item!['kategori'] ?? 'Makanan';
+      _stock = widget.item!['stok'] ?? 0;
+      _stokController.text = _stock.toString();
+      _hargaController.text = widget.item!['harga']?.toString() ?? '';
+      _deskripsiController.text = widget.item!['deskripsi'] ?? '';
+      if (kIsWeb) {
+        _webImageUrl = widget.item!['imagePath'];
+      } else {
+        final imagePath = widget.item!['imagePath'];
+        if (imagePath != null && imagePath.isNotEmpty) {
+          _imageFile = File(imagePath);
+        }
+      }
+    }
+  }
+
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
       final itemData = {
@@ -97,7 +121,7 @@ class _TambahBarangState extends State<TambahBarang> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Barang'),
+        title: Text(widget.item == null ? 'Tambah Barang' : 'Edit Barang'),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
@@ -271,10 +295,10 @@ class _TambahBarangState extends State<TambahBarang> {
                 const SizedBox(height: 32.0),
                 ElevatedButton(
                   onPressed: _saveItem,
-                  child: const Text('Simpan Barang'),
+                  child: Text('Simpan Barang'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.green, // Updated property name
+                    backgroundColor: Colors.green, 
                     foregroundColor: Colors.white, // Updated property name
                     textStyle: const TextStyle(fontSize: 16),
                   ),
@@ -285,7 +309,7 @@ class _TambahBarangState extends State<TambahBarang> {
         ),
       ),
     );
-  }
+  }// Updated property name
 
   Widget _buildFormField({
     required String label,

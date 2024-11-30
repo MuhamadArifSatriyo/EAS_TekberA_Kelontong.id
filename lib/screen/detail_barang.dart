@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:inventory_manager/screen/tambah_barang.dart';
 import 'dart:io';
 
 class DetailBarang extends StatelessWidget {
@@ -131,7 +132,17 @@ class DetailBarang extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () {
                             // Arahkan ke halaman edit
-                            onEditItem(item);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TambahBarang(
+                                    item: item,
+                                    onAddItem: (_handleAddItem) {
+                                      onEditItem(item);
+                                    },
+                                  ),
+                                )
+                            );
                           },
                           icon: const Icon(Icons.edit),
                           label: const Text('Edit Barang'),
