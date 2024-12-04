@@ -48,6 +48,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Edit Profil'),
         backgroundColor: Colors.blue.shade800,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), // Ikon tetap back
+          onPressed: () {
+            Navigator.pushNamed(context, '/home'); // Navigasi ke '/home'
+          },
+        ),
       ),
       body: Container(
         padding: const EdgeInsets.all(16.0),
