@@ -1,0 +1,12 @@
+import 'dart:io';
+
+// Function to save data to inventory.txt (assuming a list of maps or objects)
+void saveInventory(List<Map<String, dynamic>> updatedItems) async {
+  final file = File('path_to_your_inventory.txt');
+
+  // Convert the list of items to a format that can be written to the file (e.g., JSON)
+  final String updatedData = jsonEncode(updatedItems);
+
+  // Save the updated data to the file
+  await file.writeAsString(updatedData);
+}

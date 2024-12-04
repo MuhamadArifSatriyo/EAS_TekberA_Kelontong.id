@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:inventory_manager/widget/kelontong_drawer.dart';
 import '../screen/tambah_barang.dart';
 import '../screen/detail_barang.dart';
+import '../screen/edit_barang.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -18,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   String _searchQuery = '';
-  String _namaToko = 'Toko Anda'; // Variable to store store name
+  String _namaToko = 'Toko Anda';
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -39,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNamaToko();
   }
 
-  // Load store name from SharedPreferences
   Future<void> _loadNamaToko() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -47,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Load inventory from text file
   Future<void> _loadInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
@@ -58,16 +57,20 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _inventory = List<Map<String, dynamic>>.from(jsonData);
       });
+    } else {
+      setState(() {
+        _inventory = [];  // Initialize empty inventory if file doesn't exist
+      });
     }
   }
 
-  // Save inventory to text file
   Future<void> _saveInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
 
     String jsonData = json.encode(_inventory);
     await file.writeAsString(jsonData);
+    print("Inventory saved to file");
   }
 
   void _handleAddItem(Map<String, dynamic> itemData) {
@@ -82,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'imagePath': itemData['imagePath'],
       });
     });
-    _saveInventory();
+    _saveInventory();  // Save inventory after adding an item
   }
 
   String _getStockStatus(int stock) {
@@ -124,17 +127,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           title: Text.rich(
             TextSpan(
-              text: 'Halo, ', // The "Halo" part
+              text: 'Halo, ',
               style: const TextStyle(
-                color: Colors.blue, // Blue color for "Halo"
-                fontWeight: FontWeight.bold, // Bold text for "Halo"
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
               ),
               children: [
                 TextSpan(
-                  text: '$_namaToko', // Store name part
+                  text: '$_namaToko',
                   style: const TextStyle(
-                    color: Colors.black, // Black color for store name
-                    fontWeight: FontWeight.normal, // Normal weight for store name
+                    color: Colors.black,
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ],
@@ -315,42 +318,37 @@ class _HomeScreenState extends State<HomeScreen> {
               item['name'],
               style: const TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.bold,
               ),
-              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               item['category'],
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 14,
                 color: Colors.grey[600],
               ),
-              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               'Rp ${item['price'].toString()}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
+                color: Colors.grey[800],
               ),
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
               decoration: BoxDecoration(
                 color: _getStatusColor(item['status']),
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 item['status'],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),
           ],
@@ -359,18 +357,24 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onEditItem(Map<String, dynamic> item) {
+  void _onEditItem(Map<String, dynamic> editedItem) {
     setState(() {
-      int index = _inventory.indexOf(item);
-      _inventory[index] = item; // Update the item
+      // Update the item in the inventory
+      final index = _inventory.indexWhere((item) => item['name'] == editedItem['name']);
+      if (index != -1) {
+        _inventory[index] = editedItem;
+      }
     });
-    _saveInventory();
+    _saveInventory(); // Save inventory after editing
+
+    // Refresh the inventory
+    _loadInventory();
   }
 
-  void _onDeleteItem(Map<String, dynamic> item) {
+  void _onDeleteItem(Map<String, dynamic> deletedItem) {
     setState(() {
-      _inventory.remove(item);
+      _inventory.removeWhere((item) => item['name'] == deletedItem['name']);
     });
-    _saveInventory();
+    _saveInventory(); // Save inventory after deletion
   }
 }
