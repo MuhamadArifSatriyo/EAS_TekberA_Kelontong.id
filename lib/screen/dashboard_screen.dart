@@ -1,6 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_manager/widget/metric_card.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
+  @override
+  _DashboardScreenState createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  // State untuk nilai data
+  int totalProducts = 1250;
+  int stockOutProducts = 45;
+  int popularProducts = 120;
+
+  // Fungsi untuk membuka dialog dan mengupdate data
+  void _showInputDialog(String title, String metric, int currentValue, Function(int) onSave) {
+    final TextEditingController controller = TextEditingController();
+    controller.text = currentValue.toString();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit $title'),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: '$metric (Saat ini: $currentValue)',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Update data saat tombol "Simpan" ditekan
+                final newValue = int.tryParse(controller.text) ?? currentValue;
+                onSave(newValue);
+                Navigator.pop(context);
+              },
+              child: Text('Simpan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,13 +77,66 @@ class DashboardScreen extends StatelessWidget {
               SizedBox(height: 24),
 
               // Inventory Metrics Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildMetricCard('Total Produk', '1,250', Colors.blue),
-                  _buildMetricCard('Jumlah Stok Habis', '45', Colors.red),
-                  _buildMetricCard('Jumlah Produk Populer', '120', Colors.green),
-                ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  int crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+                  double cardWidth = constraints.maxWidth / crossAxisCount - 16;
+
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      MetricCard(
+                        title: 'Total Produk',
+                        value: totalProducts.toString(),
+                        color: Colors.blue,
+                        width: cardWidth,
+                        onTap: () => _showInputDialog(
+                          'Total Produk',
+                          'Jumlah Produk',
+                          totalProducts,
+                          (newValue) {
+                            setState(() {
+                              totalProducts = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                      MetricCard(
+                        title: 'Jumlah Stok Habis',
+                        value: stockOutProducts.toString(),
+                        color: Colors.red,
+                        width: cardWidth,
+                        onTap: () => _showInputDialog(
+                          'Jumlah Stok Habis',
+                          'Jumlah Stok',
+                          stockOutProducts,
+                          (newValue) {
+                            setState(() {
+                              stockOutProducts = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                      MetricCard(
+                        title: 'Jumlah Produk Populer',
+                        value: popularProducts.toString(),
+                        color: Colors.green,
+                        width: cardWidth,
+                        onTap: () => _showInputDialog(
+                          'Jumlah Produk Populer',
+                          'Jumlah Produk',
+                          popularProducts,
+                          (newValue) {
+                            setState(() {
+                              popularProducts = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               SizedBox(height: 24),
 
@@ -48,81 +149,27 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 12),
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Text(
-                    'Placeholder Grafik Stok',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Placeholder Grafik Stok',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ),
                 ),
               ),
               SizedBox(height: 24),
-
-              // Action Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // Navigasi ke halaman detail produk
-                    },
-                    icon: Icon(Icons.inventory),
-                    label: Text('View Details'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // Refresh data dashboard
-                    },
-                    icon: Icon(Icons.refresh),
-                    label: Text('Refresh Data'),
-                  ),
-                ],
-              ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMetricCard(String title, String value, Color color) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Container(
-        width: 100,
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: color.withOpacity(0.1),
-        ),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ],
         ),
       ),
     );
