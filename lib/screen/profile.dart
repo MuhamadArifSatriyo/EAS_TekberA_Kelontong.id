@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -32,6 +34,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setString('namaToko', _namaTokoController.text.trim());
     await prefs.setString('namaPemilik', _namaPemilikController.text.trim());
     await prefs.setString('alamatToko', _alamatController.text.trim());
+  }
+
+  Future<void> _saveToFile() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/profile.txt');
+      final content = 'Nama Toko: ${_namaTokoController.text}\n'
+          'Nama Pemilik: ${_namaPemilikController.text}\n'
+          'Alamat: ${_alamatController.text}\n';
+
+      await file.writeAsString(content);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Data berhasil disimpan ke file: ${file.path}')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan data ke file: $e')),
+      );
+    }
   }
 
   @override
@@ -107,6 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       await _updateDataToSharedPreferences();
+                      await _saveToFile();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Profil berhasil diperbarui!'),
