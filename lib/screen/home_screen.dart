@@ -19,7 +19,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   String _searchQuery = '';
-  String _namaToko = 'Toko Anda';
+<<<<<<<<< Temporary merge branch 1
+  String _namaToko = 'Toko Anda'; // Variabel untuk menyimpan nama toko
+=========
+  String _namaToko = 'Toko Anda'; // Variable to store store name
+>>>>>>>>> Temporary merge branch 2
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -40,6 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNamaToko();
   }
 
+<<<<<<<<< Temporary merge branch 1
+  // Load Nama Toko dari SharedPreferences
+=========
+  // Load store name from SharedPreferences
+>>>>>>>>> Temporary merge branch 2
   Future<void> _loadNamaToko() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -47,6 +56,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+<<<<<<<<< Temporary merge branch 1
+  // Load inventory dari text file
+=========
+  // Load inventory from text file
+>>>>>>>>> Temporary merge branch 2
   Future<void> _loadInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
@@ -64,6 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+<<<<<<<<< Temporary merge branch 1
+  // Simpan inventory ke text file
+=========
+  // Save inventory to text file
+>>>>>>>>> Temporary merge branch 2
   Future<void> _saveInventory() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/inventory.txt');
@@ -71,6 +90,25 @@ class _HomeScreenState extends State<HomeScreen> {
     String jsonData = json.encode(_inventory);
     await file.writeAsString(jsonData);
     print("Inventory saved to file");
+  }
+
+  void _onEditItem(Map<String, dynamic> updatedItem) {
+    setState(() {
+      final index =
+          _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
+      if (index != -1) {
+        _inventory[index] = updatedItem; // Update item
+      }
+    });
+    _saveInventory(); // Simpan data yang telah diperbarui
+  }
+
+  void _onDeleteItem(Map<String, dynamic> deletedItem) {
+    setState(() {
+      _inventory.removeWhere(
+          (item) => item['name'] == deletedItem['name']); // Hapus item
+    });
+    _saveInventory(); // Simpan data setelah dihapus
   }
 
   void _handleAddItem(Map<String, dynamic> itemData) {
@@ -107,6 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk debugging SharedPreferences
+  Future<void> printSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -136,8 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 TextSpan(
                   text: '$_namaToko',
                   style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.normal,
+                    color: Colors.black, // Black color for store name
+                    fontWeight: FontWeight.normal, // Normal weight for store name
                   ),
                 ),
               ],
@@ -341,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
               decoration: BoxDecoration(
                 color: _getStatusColor(item['status']),
                 borderRadius: BorderRadius.circular(8),
@@ -357,24 +401,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onEditItem(Map<String, dynamic> editedItem) {
+  void _onEditItem(Map<String, dynamic> item) {
     setState(() {
-      // Update the item in the inventory
-      final index = _inventory.indexWhere((item) => item['name'] == editedItem['name']);
-      if (index != -1) {
-        _inventory[index] = editedItem;
-      }
+      int index = _inventory.indexOf(item);
+      _inventory[index] = item; // Update the item
     });
-    _saveInventory(); // Save inventory after editing
-
-    // Refresh the inventory
-    _loadInventory();
+    _saveInventory();
   }
 
-  void _onDeleteItem(Map<String, dynamic> deletedItem) {
+  void _onDeleteItem(Map<String, dynamic> item) {
     setState(() {
-      _inventory.removeWhere((item) => item['name'] == deletedItem['name']);
+      _inventory.remove(item);
     });
-    _saveInventory(); // Save inventory after deletion
+    _saveInventory();
   }
 }

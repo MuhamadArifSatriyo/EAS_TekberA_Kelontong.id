@@ -14,6 +14,7 @@ class DetailBarang extends StatefulWidget {
     required this.onDeleteItem,
     required this.onEditItem,
   }) : super(key: key);
+<<<<<<< HEAD
 
   @override
   _DetailBarangState createState() => _DetailBarangState();
@@ -35,6 +36,8 @@ class _DetailBarangState extends State<DetailBarang> {
     categoryController = TextEditingController(text: widget.item['category']);
     descriptionController = TextEditingController(text: widget.item['description']);
   }
+=======
+>>>>>>> 9d4d95b333c3eb1725223089e4233f011a404d8c
 
   @override
   Widget build(BuildContext context) {
@@ -230,4 +233,8 @@ class _DetailBarangState extends State<DetailBarang> {
         return Colors.grey;
     }
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 9d4d95b333c3eb1725223089e4233f011a404d8c
