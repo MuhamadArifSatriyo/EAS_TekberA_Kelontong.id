@@ -48,11 +48,29 @@ class AppDrawer extends StatelessWidget {
               ),
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                leading: const Icon(Icons.person),
+                title: const Text('Profil'),
+                onTap: () {
+                  Navigator.pushNamed(
+                      context, '/profile'); // Route to '/profile'
+                },
+              ),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
                 leading: const Icon(Icons.dashboard),
                 title: const Text('Dashboard'),
                 onTap: () {
                   Navigator.pushNamed(
                       context, '/dashboard'); // Route to '/dashboard'
+                },
+              ),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                leading: const Icon(Icons.shopping_cart),
+                title: const Text('Transaksi'),
+                onTap: () {
+                  Navigator.pushNamed(
+                      context, '/transactions'); // Route to '/transactions'
                 },
               ),
               ListTile(
