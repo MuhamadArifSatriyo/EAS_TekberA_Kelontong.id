@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screen/home_screen.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
   @override
@@ -30,21 +28,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     await prefs.setString('alamatToko', _alamatTokoController.text.trim());
   }
 
-  Future<void> _saveDataToFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final profileFile = File('${directory.path}/profile.txt');
-    final profileData = '''
-    Nama Toko: ${_namaTokoController.text.trim()}
-    Nama Pemilik: ${_namaPemilikController.text.trim()}
-    Alamat Toko: ${_alamatTokoController.text.trim()}
-    ''';
-    await profileFile.writeAsString(profileData);
-  }
-
   void _navigateToHome() async {
     if (_formKey.currentState!.validate()) {
       await _saveDataToSharedPreferences();
-      await _saveDataToFile();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),

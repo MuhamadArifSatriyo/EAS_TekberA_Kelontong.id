@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:inventory_manager/widget/kelontong_drawer.dart';
 import '../screen/tambah_barang.dart';
 import '../screen/detail_barang.dart';
-import '../screen/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
