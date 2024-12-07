@@ -31,24 +31,33 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Future<void> _saveDataToFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final profileFile = File('${directory.path}/profile.txt');
-    final profileData = '''
-    Nama Toko: ${_namaTokoController.text.trim()}
-    Nama Pemilik: ${_namaPemilikController.text.trim()}
-    Alamat Toko: ${_alamatTokoController.text.trim()}
-    ''';
-    await profileFile.writeAsString(profileData);
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final profileFile = File('${directory.path}/profile.txt');
+      final profileData = '''
+      Nama Toko: ${_namaTokoController.text.trim()}
+      Nama Pemilik: ${_namaPemilikController.text.trim()}
+      Alamat Toko: ${_alamatTokoController.text.trim()}
+      ''';
+      await profileFile.writeAsString(profileData);
+      print("Data berhasil disimpan ke file: ${profileFile.path}");
+    } catch (e) {
+      print("Gagal menyimpan file: $e");
+    }
   }
 
   void _navigateToHome() async {
     if (_formKey.currentState!.validate()) {
+      print("Form valid, menyimpan data...");
       await _saveDataToSharedPreferences();
       await _saveDataToFile();
+      print("Data berhasil disimpan, navigasi ke HomeScreen");
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+    } else {
+      print("Form tidak valid, silakan periksa input.");
     }
   }
 
