@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 
+import 'package:inventory_manager/screen/home_screen.dart';
+
 class TambahBarang extends StatefulWidget {
   final Function(Map<String, dynamic>) onAddItem;
   final Map<String, dynamic>? item;
@@ -14,6 +16,8 @@ class TambahBarang extends StatefulWidget {
   _TambahBarangState createState() => _TambahBarangState();
 }
 
+
+
 class _TambahBarangState extends State<TambahBarang> {
   final _formKey = GlobalKey<FormState>();
   final _namaBarangController = TextEditingController();
@@ -22,6 +26,7 @@ class _TambahBarangState extends State<TambahBarang> {
   final _deskripsiController = TextEditingController();
   String _selectedCategory = 'Makanan';
   int _stock = 0;
+  
   File? _imageFile;
   String? _webImageUrl;
   final ImagePicker _picker = ImagePicker();
@@ -33,6 +38,12 @@ class _TambahBarangState extends State<TambahBarang> {
     'Minuman',
     'Lainnya',
   ];
+
+  String _getStockStatus(int stock) {
+    if (stock > 10) return 'Stok Aman';
+    if (stock > 0) return 'Stok Menipis';
+    return 'Stok Habis';
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -81,15 +92,16 @@ class _TambahBarangState extends State<TambahBarang> {
    @override
   void initState() {
     super.initState();
-
+    print(widget.item.toString());
+    print("edit data");
     // Jika item tersedia, isi form dengan nilai awal
     if (widget.item != null) {
-      _namaBarangController.text = widget.item!['nama'] ?? '';
-      _selectedCategory = widget.item!['kategori'] ?? 'Makanan';
-      _stock = widget.item!['stok'] ?? 0;
-      _stokController.text = _stock.toString();
-      _hargaController.text = widget.item!['harga']?.toString() ?? '';
-      _deskripsiController.text = widget.item!['deskripsi'] ?? '';
+      _stock = widget.item!['stock'] ?? 0;
+      _namaBarangController.text = widget.item!['name'] ?? '';
+      _selectedCategory = widget.item!['category'] ?? 'Makanan';
+      _stokController.text = widget.item!['stock'].toString() ?? "";
+      _hargaController.text = widget.item!['price']?.toString() ?? '';
+      _deskripsiController.text = widget.item!['description'] ?? '';
       if (kIsWeb) {
         _webImageUrl = widget.item!['imagePath'];
       } else {
@@ -99,11 +111,33 @@ class _TambahBarangState extends State<TambahBarang> {
         }
       }
     }
+
+    setState(() {
+      
+    });
   }
 
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
-      final itemData = {
+  
+    print(_namaBarangController.text);
+      if(widget.item != null){
+        print("TIDAK KOSONG");
+          var itemData = {
+        'name': _namaBarangController.text,
+        'category': _selectedCategory,
+        'stock': int.parse(_stokController.text),
+        'status': _getStockStatus(int.parse(_stokController.text)),
+        'price': double.tryParse(_hargaController.text.replaceAll(RegExp('[^0-9.]'), '')) ?? 0.0,
+        'description': _deskripsiController.text,
+        'imagePath': kIsWeb ? _webImageUrl : _imageFile?.path};
+        print(itemData.toString());
+        print("go to");
+         widget.onAddItem(itemData);
+
+      }else{
+
+    final itemData = {
         'nama': _namaBarangController.text,
         'kategori': _selectedCategory,
         'stok': _stock,
@@ -111,9 +145,11 @@ class _TambahBarangState extends State<TambahBarang> {
         'deskripsi': _deskripsiController.text,
         'imagePath': kIsWeb ? _webImageUrl : _imageFile?.path,
       };
-
       widget.onAddItem(itemData);
-      Navigator.pop(context);
+
+
+      }
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen(),));
     }
   }
 

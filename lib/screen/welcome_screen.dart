@@ -46,12 +46,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
+
   void _navigateToHome() async {
     if (_formKey.currentState!.validate()) {
       print("Form valid, menyimpan data...");
       await _saveDataToSharedPreferences();
       await _saveDataToFile();
-      print("Data berhasil disimpan, navigasi ke HomeScreen");
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),

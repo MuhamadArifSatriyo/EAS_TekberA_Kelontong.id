@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   String _searchQuery = '';
-  String _namaToko = 'Toko Anda'; // Variable to store store name
+  String _namaToko = 'Toko Anda';
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNamaToko();
   }
 
-  // Load store name from SharedPreferences
   Future<void> _loadNamaToko() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -46,40 +45,50 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Load inventory from text file
   Future<void> _loadInventory() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/inventory.txt');
-
-    if (await file.exists()) {
-      final contents = await file.readAsString();
-      List<dynamic> jsonData = json.decode(contents);
+    final prefs = await SharedPreferences.getInstance();
+    final savedData = prefs.getString('inventory');
+    if (savedData != null) {
       setState(() {
-        _inventory = List<Map<String, dynamic>>.from(jsonData);
+        _inventory = List<Map<String, dynamic>>.from(json.decode(savedData));
       });
     }
   }
 
-  // Save inventory to text file
   Future<void> _saveInventory() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/inventory.txt');
-
-    String jsonData = json.encode(_inventory);
-    await file.writeAsString(jsonData);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('inventory', json.encode(_inventory));
   }
 
-  // Add item to inventory
+  void _onEditItem(Map<String, dynamic> itemData) {
+    setState(() {
+      final index =
+          _inventory.indexWhere((item) => item['name'] == itemData['name']);
+      if (index != -1) {
+        _inventory[index] = itemData; // Update item
+      }
+    });
+    _saveInventory(); // Simpan data yang telah diperbarui
+  }
+
+  void _onDeleteItem(Map<String, dynamic> item) {
+    setState(() {
+      _inventory.removeWhere(
+          (existingItem) => existingItem['name'] == item['name']); // Hapus item
+    });
+    _saveInventory(); // Simpan data setelah dihapus
+  }
+
   void _handleAddItem(Map<String, dynamic> itemData) {
     setState(() {
       _inventory.add({
-        'name': itemData['nama'],
-        'category': itemData['kategori'],
-        'stock': itemData['stok'],
-        'price': itemData['harga'],
-        'description': itemData['deskripsi'],
-        'status': _getStockStatus(itemData['stok']),
-        'imagePath': itemData['imagePath'],
+        'name': newItem['nama'],
+        'category': newItem['kategori'],
+        'stock': newItem['stok'],
+        'price': newItem['harga'],
+        'description': newItem['deskripsi'],
+        'status': _getStockStatus(newItem['stok']),
+        'imagePath': newItem['imagePath'],
       });
     });
     _saveInventory();
@@ -130,10 +139,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // Fungsi untuk debugging SharedPreferences
+  Future<void> printSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        return false;
+      },
       child: DefaultTabController(
         length: _categories.length,
         child: Scaffold(
@@ -153,12 +170,14 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text.rich(
               TextSpan(
                 text: 'Halo, ',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
                 children: [
                   TextSpan(
-                    text: _namaToko,
+                    text: '$_namaToko',
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: Colors.black, 
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -351,35 +370,23 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               'Stok: ${item['stock']}',
               style: const TextStyle(
-                fontSize: 14.0,
-                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 4.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Rp ${item['price'].toString()}',
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(item['status']),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Text(
-                    item['status'],
-                    style: const TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.white,
-                    ),
-                  ),
+            const SizedBox(height: 8),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              decoration: BoxDecoration(
+                color: _getStatusColor(item['status']),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Text(
+                item['status'],
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
                 ),
               ],
             ),

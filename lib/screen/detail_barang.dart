@@ -32,7 +32,11 @@ class _DetailBarangState extends State<DetailBarang> {
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
+<<<<<<< HEAD
       body: SingleChildScrollView(
+=======
+      body: Padding(
+>>>>>>> fa1cf45182102d7cb7313a47f83b0720b01cf0d8
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
