@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  List<String> _categories = ['All', 'Makanan', 'Minuman']; 
+  List<String> _categories = ['All', 'Makanan', 'Minuman'];
 
   @override
   void initState() {
@@ -319,55 +319,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
-              maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
             const SizedBox(height: 4),
             // Product Category
             Text(
               item['category'],
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 14,
                 color: Colors.grey[600],
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
-            // Product Price
-            Text(
-              'Rp ${item['price'].toString()}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Stock Status
+            // Product Stock Status
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${item['stock'].toString()}',
+                  item['status'],
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
                     color: _getStatusColor(item['status']),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(item['status']).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    item['status'],
-                    style: TextStyle(
-                      color: _getStatusColor(item['status']),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                const Spacer(),
+                // Product Price
+                Text(
+                  'Rp ${item['price']}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
                   ),
                 ),
               ],
