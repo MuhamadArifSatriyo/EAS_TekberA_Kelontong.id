@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Konfirmasi'),
-          content: Text('Apakah Anda yakin ingin kembali ke halaman sebelumnya?'),
+          content: Text('Apakah anda yakin untuk meninggalkan halaman ini?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
