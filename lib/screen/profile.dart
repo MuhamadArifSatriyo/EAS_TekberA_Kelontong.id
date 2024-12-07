@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,8 +14,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _namaTokoController = TextEditingController();
   final _namaPemilikController = TextEditingController();
   final _alamatController = TextEditingController();
-
-  File? _imageFile; // Gambar lokal
+  String? _base64Image; // Gambar dalam format base64
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -29,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _namaTokoController.text = prefs.getString('namaToko') ?? '';
       _namaPemilikController.text = prefs.getString('namaPemilik') ?? '';
       _alamatController.text = prefs.getString('alamatToko') ?? '';
+      _base64Image = prefs.getString('profileImage'); // Ambil base64 gambar
     });
   }
 
@@ -37,8 +38,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setString('namaToko', _namaTokoController.text.trim());
     await prefs.setString('namaPemilik', _namaPemilikController.text.trim());
     await prefs.setString('alamatToko', _alamatController.text.trim());
-    if (_imageFile != null) {
-      await prefs.setString('profileImagePath', _imageFile!.path);
+
+    if (_base64Image != null) {
+      await prefs.setString(
+          'profileImage', _base64Image!); // Simpan gambar base64
     }
   }
 
@@ -48,8 +51,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _base64Image = base64Encode(bytes); // Konversi ke base64
       });
     }
   }
@@ -105,9 +109,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: _pickImage,
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: _imageFile != null
-                        ? FileImage(_imageFile!)
-                        : const AssetImage('images/profile.png') as ImageProvider,
+                    backgroundImage: _base64Image != null
+                        ? MemoryImage(base64Decode(
+                            _base64Image!)) // Load gambar dari base64
+                        : const AssetImage('images/profile.png')
+                            as ImageProvider,
                   ),
                 ),
                 TextButton(
