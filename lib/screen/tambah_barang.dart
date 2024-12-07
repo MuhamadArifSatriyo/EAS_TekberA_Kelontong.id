@@ -4,14 +4,19 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 
+import 'package:inventory_manager/screen/home_screen.dart';
+
 class TambahBarang extends StatefulWidget {
   final Function(Map<String, dynamic>) onAddItem;
+  final Map<String, dynamic>? item;
 
-  const TambahBarang({Key? key, required this.onAddItem}) : super(key: key);
+  const TambahBarang({Key? key, required this.onAddItem, this.item}) : super(key: key);
 
   @override
   _TambahBarangState createState() => _TambahBarangState();
 }
+
+
 
 class _TambahBarangState extends State<TambahBarang> {
   final _formKey = GlobalKey<FormState>();
@@ -21,6 +26,7 @@ class _TambahBarangState extends State<TambahBarang> {
   final _deskripsiController = TextEditingController();
   String _selectedCategory = 'Makanan';
   int _stock = 0;
+  
   File? _imageFile;
   String? _webImageUrl;
   final ImagePicker _picker = ImagePicker();
@@ -32,6 +38,12 @@ class _TambahBarangState extends State<TambahBarang> {
     'Minuman',
     'Lainnya',
   ];
+
+  String _getStockStatus(int stock) {
+    if (stock > 10) return 'Stok Aman';
+    if (stock > 0) return 'Stok Menipis';
+    return 'Stok Habis';
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -77,9 +89,55 @@ class _TambahBarangState extends State<TambahBarang> {
     });
   }
 
+   @override
+  void initState() {
+    super.initState();
+    print(widget.item.toString());
+    print("edit data");
+    // Jika item tersedia, isi form dengan nilai awal
+    if (widget.item != null) {
+      _stock = widget.item!['stock'] ?? 0;
+      _namaBarangController.text = widget.item!['name'] ?? '';
+      _selectedCategory = widget.item!['category'] ?? 'Makanan';
+      _stokController.text = widget.item!['stock'].toString() ?? "";
+      _hargaController.text = widget.item!['price']?.toString() ?? '';
+      _deskripsiController.text = widget.item!['description'] ?? '';
+      if (kIsWeb) {
+        _webImageUrl = widget.item!['imagePath'];
+      } else {
+        final imagePath = widget.item!['imagePath'];
+        if (imagePath != null && imagePath.isNotEmpty) {
+          _imageFile = File(imagePath);
+        }
+      }
+    }
+
+    setState(() {
+      
+    });
+  }
+
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
-      final itemData = {
+  
+    print(_namaBarangController.text);
+      if(widget.item != null){
+        print("TIDAK KOSONG");
+          var itemData = {
+        'name': _namaBarangController.text,
+        'category': _selectedCategory,
+        'stock': int.parse(_stokController.text),
+        'status': _getStockStatus(int.parse(_stokController.text)),
+        'price': double.tryParse(_hargaController.text.replaceAll(RegExp('[^0-9.]'), '')) ?? 0.0,
+        'description': _deskripsiController.text,
+        'imagePath': kIsWeb ? _webImageUrl : _imageFile?.path};
+        print(itemData.toString());
+        print("go to");
+         widget.onAddItem(itemData);
+
+      }else{
+
+    final itemData = {
         'nama': _namaBarangController.text,
         'kategori': _selectedCategory,
         'stok': _stock,
@@ -87,9 +145,11 @@ class _TambahBarangState extends State<TambahBarang> {
         'deskripsi': _deskripsiController.text,
         'imagePath': kIsWeb ? _webImageUrl : _imageFile?.path,
       };
-
       widget.onAddItem(itemData);
-      Navigator.pop(context);
+
+
+      }
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen(),));
     }
   }
 
@@ -97,7 +157,7 @@ class _TambahBarangState extends State<TambahBarang> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Barang'),
+        title: Text(widget.item == null ? 'Tambah Barang' : 'Edit Barang'),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
@@ -271,10 +331,10 @@ class _TambahBarangState extends State<TambahBarang> {
                 const SizedBox(height: 32.0),
                 ElevatedButton(
                   onPressed: _saveItem,
-                  child: const Text('Simpan Barang'),
+                  child: Text('Simpan Barang'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.green, // Updated property name
+                    backgroundColor: Colors.green, 
                     foregroundColor: Colors.white, // Updated property name
                     textStyle: const TextStyle(fontSize: 16),
                   ),
@@ -285,7 +345,7 @@ class _TambahBarangState extends State<TambahBarang> {
         ),
       ),
     );
-  }
+  }// Updated property name
 
   Widget _buildFormField({
     required String label,

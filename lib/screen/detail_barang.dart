@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import '../screen/edit_barang.dart';
+import 'package:inventory_manager/screen/tambah_barang.dart';
 import 'dart:io';
 
 class DetailBarang extends StatefulWidget {
@@ -14,31 +14,12 @@ class DetailBarang extends StatefulWidget {
     required this.onDeleteItem,
     required this.onEditItem,
   }) : super(key: key);
-<<<<<<< HEAD
 
   @override
-  _DetailBarangState createState() => _DetailBarangState();
+  State<DetailBarang> createState() => _DetailBarangState();
 }
 
 class _DetailBarangState extends State<DetailBarang> {
-  late TextEditingController stockController;
-  late TextEditingController priceController;
-  late TextEditingController nameController;
-  late TextEditingController categoryController;
-  late TextEditingController descriptionController;
-
-  @override
-  void initState() {
-    super.initState();
-    stockController = TextEditingController(text: widget.item['stock'].toString());
-    priceController = TextEditingController(text: widget.item['price'].toString());
-    nameController = TextEditingController(text: widget.item['name']);
-    categoryController = TextEditingController(text: widget.item['category']);
-    descriptionController = TextEditingController(text: widget.item['description']);
-  }
-=======
->>>>>>> 9d4d95b333c3eb1725223089e4233f011a404d8c
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +32,7 @@ class _DetailBarangState extends State<DetailBarang> {
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,63 +134,68 @@ class _DetailBarangState extends State<DetailBarang> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditBarangScreen(
-                                  item: widget.item, // Pass the item data to EditBarangScreen
-                                  onSaveEdit: (editedItem) {
-                                    widget.onEditItem(editedItem); // Call onEditItem with the edited item
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.edit),
-                          label: const Text('Edit Barang'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              // Arahkan ke halaman edit
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TambahBarang(
+                                      item: widget.item,
+                                      onAddItem: (_handleAddItem) {
+                                        setState(() {
+                                          widget.onEditItem(_handleAddItem);
+                                        });
+                                      },
+                                    ),
+                                  )
+                              );
+                            },
+                            icon: const Icon(Icons.edit),
+                            label: const Text('Edit Barang'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                            ),
                           ),
                         ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.delete),
-                          label: const Text('Hapus Barang'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                          ),
-                          onPressed: () {
-                            // Konfirmasi hapus
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Hapus Barang'),
-                                content: const Text(
-                                    'Apakah Anda yakin ingin menghapus barang ini?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context); // Tutup dialog
-                                    },
-                                    child: const Text('Batal'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context); // Tutup dialog
-                                      widget.onDeleteItem(widget.item); // Hapus barang
-                                      Navigator.pop(
-                                          context); // Kembali ke daftar
-                                    },
-                                    child: const Text(
-                                      'Hapus',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
+                        Expanded(
+                          child: ElevatedButton.icon(
+                              icon: const Icon(Icons.delete),
+                              label: const Text('Hapus Barang'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
                               ),
-                            );
-                          },
+                              onPressed: () {
+                                // Konfirmasi hapus
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Hapus Barang'),
+                                    content: const Text(
+                                        'Apakah Anda yakin ingin menghapus barang ini?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context); // Tutup dialog
+                                        },
+                                        child: const Text('Batal'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                        Navigator.pop(context); // Close dialog
+                                      widget.onDeleteItem(widget.item); // Delete item from inventory
+                                      Navigator.pop(context); // Go back to HomeScreen
+                                        },
+                                        child: const Text(
+                                          'Hapus',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
                         ),
                       ],
                     ),
@@ -233,8 +219,4 @@ class _DetailBarangState extends State<DetailBarang> {
         return Colors.grey;
     }
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 9d4d95b333c3eb1725223089e4233f011a404d8c

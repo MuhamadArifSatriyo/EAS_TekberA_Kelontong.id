@@ -1,41 +1,41 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'screen/home_screen.dart'; // Import home screen
-import 'screen/dashboard_screen.dart'; // Import dashboard screen
-import 'screen/about_us_screen.dart'; // Import about us screen
-import 'screen/profile.dart'; // Import profile screen
-import 'screen/transactions.dart'; // Import transactions screen
-import 'screen/welcome_screen.dart'; // Import welcome screen
-=======
 import '../screen/welcome_screen.dart';
 import '../screen/home_screen.dart';
 import '../screen/dashboard_screen.dart';
 import '../screen/about_us_screen.dart';
->>>>>>> 9d4d95b333c3eb1725223089e4233f011a404d8c
+import '../screen/profile.dart'; // Import halaman profil
+import '../screen/transactions.dart'; // Import halaman transaksi
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Check if profile.txt exists
+  final directory = await getApplicationDocumentsDirectory();
+  final profileFile = File('${directory.path}/profile.txt');
+
+  runApp(MyApp(initialRoute: await profileFile.exists() ? '/home' : '/'));
 }
 
 class MyApp extends StatelessWidget {
+  final String initialRoute;
+  MyApp({required this.initialRoute});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-<<<<<<< HEAD
-      initialRoute: '/', // Define the initial route
-=======
-      initialRoute:
-          '/', // Define the initial route (could be WelcomeScreen or HomeScreen)
->>>>>>> 9d4d95b333c3eb1725223089e4233f011a404d8c
+      initialRoute: initialRoute, // Define the initial route
       routes: {
-        '/': (context) => WelcomeScreen(),
-        '/home': (context) => HomeScreen(),
-        '/dashboard': (context) => DashboardScreen(),
-        '/aboutUs': (context) => AboutUsScreen(),
-        '/profile': (context) => ProfileScreen(),
-        '/transactions': (context) => TransactionsScreen(),
+        '/': (context) => WelcomeScreen(), // Welcome screen route
+        '/home': (context) => HomeScreen(), // Home screen route
+        '/dashboard': (context) => DashboardScreen(), // Dashboard screen route
+        '/aboutUs': (context) => AboutUsScreen(), // AboutUs screen route
+        '/profile': (context) => ProfileScreen(), // Profile screen route
+        '/transactions': (context) =>
+            TransactionsScreen(), // Transactions screen route
       },
     );
   }

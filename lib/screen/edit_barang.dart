@@ -85,13 +85,14 @@ class _EditBarangScreenState extends State<EditBarangScreen> {
   }
 
   final itemData = {
-    'name': _nameController.text,
-    'category': _categoryController.text,
-    'price': double.tryParse(_priceController.text) ?? 0.0,
-    'stock': int.tryParse(_stockController.text) ?? 0,
-    'description': _descriptionController.text,
-    'imagePath': _imagePath,
-  };
+  'name': _nameController.text,
+  'category': _categoryController.text,
+  'price': double.tryParse(_priceController.text) ?? 0.0,
+  'stock': int.tryParse(_stockController.text) ?? 0,
+  'description': _descriptionController.text,
+  'imagePath': _imagePath,
+};
+widget.onSaveEdit(itemData);  
 
   widget.onSaveEdit(itemData); // Pass the edited item data to the parent screen
   Navigator.pop(context);  // Go back to the previous screen (HomeScreen)
@@ -186,23 +187,25 @@ class _EditBarangScreenState extends State<EditBarangScreen> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 32.0),
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       final updatedItem = {
+                        'id': widget.item['id'], // Keep the same id
                         'name': _nameController.text,
                         'category': _categoryController.text,
                         'price': double.tryParse(_priceController.text) ?? 0.0,
                         'stock': int.tryParse(_stockController.text) ?? 0,
                         'description': _descriptionController.text,
-                        'imagePath': widget.item['imagePath'],  // Keep the same image path
+                        'imagePath': _imagePath, // Keep the updated imagePath
                       };
 
-                      widget.onSaveEdit(updatedItem); // Pass the edited item to the parent
-                      Navigator.pop(context);  // Close the EditBarangScreen and return to HomeScreen
+                      widget.onSaveEdit(updatedItem); // Pass the updated item to the parent
+                      Navigator.pop(context); // Close the EditBarangScreen
                     }
                   },
-                  child: const Text('Simpan Perubahan'),
+                  icon: const Icon(Icons.save),
+                  label: const Text('Simpan Perubahan'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                     backgroundColor: Colors.green,
