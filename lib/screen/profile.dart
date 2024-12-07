@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setString('alamatToko', _alamatController.text.trim());
   }
 
-  Future<void> _saveToFile() async {
+  Future<bool> _saveToFile() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/profile.txt');
@@ -45,14 +45,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'Alamat: ${_alamatController.text}\n';
 
       await file.writeAsString(content);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profil berhasil diperbarui!')),
-      );
+      print("Data berhasil disimpan ke file: ${file.path}");
+      return true; // Indikator sukses
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menyimpan data ke file')),
-      );
+      print("Gagal menyimpan file: $e");
+      return false; // Indikator gagal
     }
   }
 
