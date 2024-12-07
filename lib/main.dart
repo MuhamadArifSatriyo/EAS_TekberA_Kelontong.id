@@ -22,7 +22,7 @@ void main() async {
     }
   } catch (e) {
     // Jika gagal (misalnya di Chrome View), fallback ke route default "/"
-    print("Error accessing file system");
+    print("Error accessing file systemm");
   }
 
   runApp(MyApp(initialRoute: initialRoute));
