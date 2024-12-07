@@ -10,12 +10,22 @@ import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  String initialRoute = '/';
 
-  // Check if profile.txt exists
-  final directory = await getApplicationDocumentsDirectory();
-  final profileFile = File('${directory.path}/profile.txt');
+  try {
+    // Coba membaca file profile untuk platform yang mendukung file system
+    final directory = await getApplicationDocumentsDirectory();
+    final profileFile = File('${directory.path}/profile.txt');
 
-  runApp(MyApp(initialRoute: await profileFile.exists() ? '/home' : '/'));
+    if (await profileFile.exists()) {
+      initialRoute = '/home';
+    }
+  } catch (e) {
+    // Jika gagal (misalnya di Chrome View), fallback ke route default "/"
+    print("Error accessing file system");
+  }
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 class MyApp extends StatelessWidget {
