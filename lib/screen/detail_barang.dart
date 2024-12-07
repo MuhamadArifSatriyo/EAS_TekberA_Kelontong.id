@@ -20,6 +20,13 @@ class DetailBarang extends StatefulWidget {
 }
 
 class _DetailBarangState extends State<DetailBarang> {
+  // This function will handle the item edit and update the UI
+  void _handleEditItem(Map<String, dynamic> updatedItem) {
+    setState(() {
+      widget.item.addAll(updatedItem);  // Update the current item data with the edited data
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,19 +144,19 @@ class _DetailBarangState extends State<DetailBarang> {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              // Arahkan ke halaman edit
+                              // Arahkan ke halaman edit dan pass the current item
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TambahBarang(
-                                      item: widget.item,
-                                      onAddItem: (_handleAddItem) {
-                                        setState(() {
-                                          widget.onEditItem(_handleAddItem);
-                                        });
-                                      },
-                                    ),
-                                  )
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TambahBarang(
+                                    item: widget.item,
+                                    onAddItem: (updatedItem) {
+                                      // When item is updated, handle the update
+                                      _handleEditItem(updatedItem);
+                                      widget.onEditItem(updatedItem); // Pass the updated item back
+                                    },
+                                  ),
+                                ),
                               );
                             },
                             icon: const Icon(Icons.edit),
@@ -161,41 +168,42 @@ class _DetailBarangState extends State<DetailBarang> {
                         ),
                         Expanded(
                           child: ElevatedButton.icon(
-                              icon: const Icon(Icons.delete),
-                              label: const Text('Hapus Barang'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
-                              onPressed: () {
-                                // Konfirmasi hapus
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Hapus Barang'),
-                                    content: const Text(
-                                        'Apakah Anda yakin ingin menghapus barang ini?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context); // Tutup dialog
-                                        },
-                                        child: const Text('Batal'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
+                            icon: const Icon(Icons.delete),
+                            label: const Text('Hapus Barang'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            onPressed: () {
+                              // Konfirmasi hapus
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Hapus Barang'),
+                                  content: const Text(
+                                      'Apakah Anda yakin ingin menghapus barang ini?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context); // Tutup dialog
+                                      },
+                                      child: const Text('Batal'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
                                         Navigator.pop(context); // Close dialog
-                                      widget.onDeleteItem(widget.item); // Delete item from inventory
-                                      Navigator.pop(context); // Go back to HomeScreen
-                                        },
-                                        child: const Text(
-                                          'Hapus',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
+                                        widget.onDeleteItem(widget.item); // Delete item from inventory
+                                        Navigator.pop(context); // Go back to HomeScreen
+                                      },
+                                      child: const Text(
+                                        'Hapus',
+                                        style: TextStyle(color: Colors.red),
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
