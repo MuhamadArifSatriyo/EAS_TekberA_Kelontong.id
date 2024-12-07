@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:convert';
 
 class EditBarangScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -31,13 +29,6 @@ class _EditBarangScreenState extends State<EditBarangScreen> {
   File? _imageFile;
 
   final ImagePicker _picker = ImagePicker();
-  final List<String> _categories = [
-    'Makanan',
-    'Sayuran',
-    'Peralatan Rumah Tangga',
-    'Minuman',
-    'Lainnya',
-  ];
 
   @override
   void initState() {
@@ -85,17 +76,16 @@ class _EditBarangScreenState extends State<EditBarangScreen> {
   }
 
   final itemData = {
-  'name': _nameController.text,
-  'category': _categoryController.text,
-  'price': double.tryParse(_priceController.text) ?? 0.0,
-  'stock': int.tryParse(_stockController.text) ?? 0,
-  'description': _descriptionController.text,
-  'imagePath': _imagePath,
-};
-widget.onSaveEdit(itemData);  
+    'name': _nameController.text,
+    'category': _categoryController.text,
+    'price': double.tryParse(_priceController.text) ?? 0.0,
+    'stock': int.tryParse(_stockController.text) ?? 0,
+    'description': _descriptionController.text,
+    'imagePath': _imagePath,
+  };
 
-  widget.onSaveEdit(itemData); // Pass the edited item data to the parent screen
-  Navigator.pop(context);  // Go back to the previous screen (HomeScreen)
+  widget.onSaveEdit(itemData);  // Pass the edited item data to the parent screen
+  Navigator.pop(context);  // Go back to the previous screen
 }
 
   @override
@@ -188,22 +178,7 @@ widget.onSaveEdit(itemData);
                 ),
                 const SizedBox(height: 32.0),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final updatedItem = {
-                        'id': widget.item['id'], // Keep the same id
-                        'name': _nameController.text,
-                        'category': _categoryController.text,
-                        'price': double.tryParse(_priceController.text) ?? 0.0,
-                        'stock': int.tryParse(_stockController.text) ?? 0,
-                        'description': _descriptionController.text,
-                        'imagePath': _imagePath, // Keep the updated imagePath
-                      };
-
-                      widget.onSaveEdit(updatedItem); // Pass the updated item to the parent
-                      Navigator.pop(context); // Close the EditBarangScreen
-                    }
-                  },
+                  onPressed: _saveItem,
                   icon: const Icon(Icons.save),
                   label: const Text('Simpan Perubahan'),
                   style: ElevatedButton.styleFrom(
