@@ -47,11 +47,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await file.writeAsString(content);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Data berhasil disimpan ke file: ${file.path}')),
+        SnackBar(content: Text('Profil berhasil diperbarui!')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menyimpan data ke file: $e')),
+        SnackBar(content: Text('Gagal menyimpan data ke file')),
       );
     }
   }

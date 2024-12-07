@@ -83,13 +83,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onDeleteItem(Map<String, dynamic> item) {
     setState(() {
       _inventory.removeWhere(
-        (existingItem) => existingItem['name'] == item['name']
-      ); // Hapus item
+          (existingItem) => existingItem['name'] == item['name']); // Hapus item
     });
     _saveInventory(); // Simpan data setelah dihapus
   }
 
-void _handleAddItem(Map<String, dynamic> itemData) {
+  void _handleAddItem(Map<String, dynamic> itemData) {
     setState(() {
       _inventory.add({
         'name': itemData['nama'],
@@ -131,143 +130,146 @@ void _handleAddItem(Map<String, dynamic> itemData) {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: _categories.length,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          elevation: 0,
-          leading: Builder(
-            builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.sort_rounded, color: Colors.black),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-              );
-            },
-          ),
-          title: Text.rich(
-            TextSpan(
-              text: 'Halo, ', 
-              style: const TextStyle(
-                fontWeight: FontWeight.bold, 
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: DefaultTabController(
+        length: _categories.length,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            elevation: 0,
+            leading: Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.sort_rounded, color: Colors.black),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                );
+              },
+            ),
+            title: Text.rich(
+              TextSpan(
+                text: 'Halo, ',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                children: [
+                  TextSpan(
+                    text: '$_namaToko',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
+            ),
+            centerTitle: true,
+            bottom: TabBar(
+              onTap: (index) {
+                setState(() {});
+              },
+              isScrollable: true,
+              labelColor: Colors.blue,
+              unselectedLabelColor: Colors.black,
+              indicatorColor: Colors.blue,
+              tabs: _categories.map((category) {
+                return Tab(text: category);
+              }).toList(),
+            ),
+          ),
+          drawer: AppDrawer(namaToko: _namaToko),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
               children: [
-                TextSpan(
-                  text: '$_namaToko', 
-                  style: const TextStyle(
-                    color: Colors.black, 
-                    fontWeight:
-                        FontWeight.normal,
+                TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Cari Barang',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                Expanded(
+                  child: TabBarView(
+                    children: _categories.map((category) {
+                      List<Map<String, dynamic>> filteredInventory =
+                          _inventory.where(
+                        (item) {
+                          return (category == 'All' ||
+                                  item['category'] == category) &&
+                              item['name']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery.toLowerCase());
+                        },
+                      ).toList();
+
+                      return filteredInventory.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.inventory_2_outlined,
+                                      size: 64, color: Colors.grey[400]),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Belum ada barang',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 12.0,
+                                crossAxisSpacing: 12.0,
+                                childAspectRatio: 0.60,
+                              ),
+                              itemCount: filteredInventory.length,
+                              itemBuilder: (context, index) {
+                                final item = filteredInventory[index];
+                                return _buildItemCard(item);
+                              },
+                            );
+                    }).toList(),
                   ),
                 ),
               ],
             ),
           ),
-          centerTitle: true,
-          bottom: TabBar(
-            onTap: (index) {
-              setState(() {
-              });
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TambahBarang(onAddItem: _handleAddItem),
+                ),
+              );
             },
-            isScrollable: true,
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.black,
-            indicatorColor: Colors.blue,
-            tabs: _categories.map((category) {
-              return Tab(text: category);
-            }).toList(),
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.add, color: Colors.white),
           ),
-        ),
-        drawer: AppDrawer(namaToko: _namaToko),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Cari Barang',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              Expanded(
-                child: TabBarView(
-                  children: _categories.map((category) {
-                    List<Map<String, dynamic>> filteredInventory =
-                        _inventory.where(
-                      (item) {
-                        return (category == 'All' ||
-                                item['category'] == category) &&
-                            item['name']
-                                .toString()
-                                .toLowerCase()
-                                .contains(_searchQuery.toLowerCase());
-                      },
-                    ).toList();
-
-                    return filteredInventory.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.inventory_2_outlined,
-                                    size: 64, color: Colors.grey[400]),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Belum ada barang',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 12.0,
-                              crossAxisSpacing: 12.0,
-                              childAspectRatio: 0.60,
-                            ),
-                            itemCount: filteredInventory.length,
-                            itemBuilder: (context, index) {
-                              final item = filteredInventory[index];
-                              return _buildItemCard(item);
-                            },
-                          );
-                  }).toList(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TambahBarang(onAddItem: _handleAddItem),
-              ),
-            );
-          },
-          backgroundColor: Colors.blue,
-          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
