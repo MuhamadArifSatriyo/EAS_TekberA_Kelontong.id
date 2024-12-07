@@ -60,26 +60,24 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setString('inventory', json.encode(_inventory));
   }
 
-  void _onEditItem(Map<String, dynamic> itemData) {
+  void _onEditItem(Map<String, dynamic> updatedItem) {
     setState(() {
-      final index =
-          _inventory.indexWhere((item) => item['name'] == itemData['name']);
+      final index = _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
       if (index != -1) {
-        _inventory[index] = itemData; // Update item
+        _inventory[index] = updatedItem;
       }
     });
-    _saveInventory(); // Simpan data yang telah diperbarui
+    _saveInventory();
   }
 
   void _onDeleteItem(Map<String, dynamic> item) {
     setState(() {
-      _inventory.removeWhere(
-          (existingItem) => existingItem['name'] == item['name']); // Hapus item
+      _inventory.removeWhere((existingItem) => existingItem['name'] == item['name']);
     });
-    _saveInventory(); // Simpan data setelah dihapus
+    _saveInventory();
   }
 
-  void _handleAddItem(Map<String, dynamic> itemData) {
+  void _handleAddItem(Map<String, dynamic> newItem) {
     setState(() {
       _inventory.add({
         'name': newItem['nama'],
@@ -94,38 +92,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _saveInventory();
   }
 
-  // Edit item in inventory
-  void _onEditItem(Map<String, dynamic> itemData) {
-    setState(() {
-      final index =
-          _inventory.indexWhere((item) => item['name'] == itemData['name']);
-      if (index != -1) {
-        _inventory[index] = {
-          ...itemData,
-          'status': _getStockStatus(itemData['stock']),
-        };
-      }
-    });
-    _saveInventory();
-  }
-
-  // Delete item from inventory
-  void _onDeleteItem(Map<String, dynamic> item) {
-    setState(() {
-      _inventory.removeWhere(
-          (existingItem) => existingItem['name'] == item['name']);
-    });
-    _saveInventory();
-  }
-
-  // Get stock status based on stock count
   String _getStockStatus(int stock) {
     if (stock > 10) return 'Stok Aman';
     if (stock > 0) return 'Stok Menipis';
     return 'Stok Habis';
   }
 
-  // Get color based on stock status
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Stok Aman':
@@ -139,23 +111,45 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Fungsi untuk debugging SharedPreferences
-  Future<void> printSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  // Fungsi untuk menangani popback dengan konfirmasi
+  Future<bool> _onWillPop() async {
+    // Menampilkan dialog konfirmasi ketika pengguna mencoba menekan tombol kembali
+    final shouldPop = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi'),
+          content: Text('Apakah Anda yakin ingin kembali ke halaman sebelumnya?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Keluar dari halaman
+              },
+              child: Text('Ya'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Tidak keluar
+              },
+              child: Text('Tidak'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldPop ?? false; // Mengembalikan nilai yang didapatkan dari dialog
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+      onWillPop: _onWillPop, // Menambahkan konfirmasi saat tombol back ditekan
       child: DefaultTabController(
         length: _categories.length,
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
             elevation: 0,
             leading: Builder(
               builder: (context) {
@@ -169,13 +163,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             title: Text.rich(
               TextSpan(
-                text: 'Halo, ',
+                text: 'Halo, ', 
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.bold, 
                 ),
                 children: [
                   TextSpan(
-                    text: '$_namaToko',
+                    text: '$_namaToko', 
                     style: const TextStyle(
                       color: Colors.black, 
                       fontWeight: FontWeight.normal,
@@ -186,11 +180,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             centerTitle: true,
             bottom: TabBar(
+              onTap: (index) {
+                setState(() {});
+              },
               isScrollable: true,
               labelColor: Colors.blue,
               unselectedLabelColor: Colors.black,
               indicatorColor: Colors.blue,
-              tabs: _categories.map((category) => Tab(text: category)).toList(),
+              tabs: _categories.map((category) {
+                return Tab(text: category);
+              }).toList(),
             ),
           ),
           drawer: AppDrawer(namaToko: _namaToko),
@@ -219,14 +218,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: TabBarView(
                     children: _categories.map((category) {
-                      final filteredInventory = _inventory.where((item) {
-                        return (category == 'All' ||
-                                item['category'] == category) &&
-                            item['name']
-                                .toString()
-                                .toLowerCase()
-                                .contains(_searchQuery.toLowerCase());
-                      }).toList();
+                      List<Map<String, dynamic>> filteredInventory =
+                          _inventory.where(
+                        (item) {
+                          return (category == 'All' ||
+                                  item['category'] == category) &&
+                              item['name']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(_searchQuery.toLowerCase());
+                        },
+                      ).toList();
 
                       return filteredInventory.isEmpty
                           ? Center(
@@ -272,8 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      TambahBarang(onAddItem: _handleAddItem),
+                  builder: (context) => TambahBarang(onAddItem: _handleAddItem),
                 ),
               );
             },
@@ -337,56 +338,61 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 100,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.image, size: 48),
+                child: const Icon(
+                  Icons.image_not_supported,
+                  color: Colors.grey,
+                  size: 48,
+                ),
               ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 8),
             Text(
               item['name'],
               style: const TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                Icon(Icons.category, size: 16, color: Colors.grey[700]),
-                const SizedBox(width: 4.0),
-                Text(
-                  item['category'],
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-            const Spacer(),
+            const SizedBox(height: 8),
             Text(
-              'Stok: ${item['stock']}',
+              item['category'],
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Rp ${item['price'].toString()}',
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 8),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              decoration: BoxDecoration(
-                color: _getStatusColor(item['status']),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Text(
-                item['status'],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${item['stock'].toString()}',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: _getStatusColor(item['status']),
+                  ),
+                ),
+                Text(
+                  item['status'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _getStatusColor(item['status']),
+                  ),
                 ),
               ],
             ),
