@@ -69,25 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await file.writeAsString(jsonData);
   }
 
-  void _onEditItem(Map<String, dynamic> itemData) {
-    setState(() {
-      final index =
-          _inventory.indexWhere((item) => item['name'] == itemData['name']);
-      if (index != -1) {
-        _inventory[index] = itemData; // Update item
-      }
-    });
-    _saveInventory(); // Simpan data yang telah diperbarui
-  }
-
-  void _onDeleteItem(Map<String, dynamic> item) {
-    setState(() {
-      _inventory.removeWhere(
-          (existingItem) => existingItem['name'] == item['name']); // Hapus item
-    });
-    _saveInventory(); // Simpan data setelah dihapus
-  }
-
+  // Add item to inventory
   void _handleAddItem(Map<String, dynamic> itemData) {
     setState(() {
       _inventory.add({
@@ -103,12 +85,38 @@ class _HomeScreenState extends State<HomeScreen> {
     _saveInventory();
   }
 
+  // Edit item in inventory
+  void _onEditItem(Map<String, dynamic> itemData) {
+    setState(() {
+      final index =
+          _inventory.indexWhere((item) => item['name'] == itemData['name']);
+      if (index != -1) {
+        _inventory[index] = {
+          ...itemData,
+          'status': _getStockStatus(itemData['stock']),
+        };
+      }
+    });
+    _saveInventory();
+  }
+
+  // Delete item from inventory
+  void _onDeleteItem(Map<String, dynamic> item) {
+    setState(() {
+      _inventory.removeWhere(
+          (existingItem) => existingItem['name'] == item['name']);
+    });
+    _saveInventory();
+  }
+
+  // Get stock status based on stock count
   String _getStockStatus(int stock) {
     if (stock > 10) return 'Stok Aman';
     if (stock > 0) return 'Stok Menipis';
     return 'Stok Habis';
   }
 
+  // Get color based on stock status
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Stok Aman':
@@ -122,23 +130,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Fungsi untuk debugging SharedPreferences
-  Future<void> printSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+      onWillPop: () async => false,
       child: DefaultTabController(
         length: _categories.length,
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            backgroundColor: Colors.white,
             elevation: 0,
             leading: Builder(
               builder: (context) {
@@ -153,12 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text.rich(
               TextSpan(
                 text: 'Halo, ',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
                 children: [
                   TextSpan(
-                    text: '$_namaToko',
+                    text: _namaToko,
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.normal,
@@ -169,16 +167,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             centerTitle: true,
             bottom: TabBar(
-              onTap: (index) {
-                setState(() {});
-              },
               isScrollable: true,
               labelColor: Colors.blue,
               unselectedLabelColor: Colors.black,
               indicatorColor: Colors.blue,
-              tabs: _categories.map((category) {
-                return Tab(text: category);
-              }).toList(),
+              tabs: _categories.map((category) => Tab(text: category)).toList(),
             ),
           ),
           drawer: AppDrawer(namaToko: _namaToko),
@@ -207,17 +200,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: TabBarView(
                     children: _categories.map((category) {
-                      List<Map<String, dynamic>> filteredInventory =
-                          _inventory.where(
-                        (item) {
-                          return (category == 'All' ||
-                                  item['category'] == category) &&
-                              item['name']
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(_searchQuery.toLowerCase());
-                        },
-                      ).toList();
+                      final filteredInventory = _inventory.where((item) {
+                        return (category == 'All' ||
+                                item['category'] == category) &&
+                            item['name']
+                                .toString()
+                                .toLowerCase()
+                                .contains(_searchQuery.toLowerCase());
+                      }).toList();
 
                       return filteredInventory.isEmpty
                           ? Center(
@@ -263,7 +253,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => TambahBarang(onAddItem: _handleAddItem),
+                  builder: (context) =>
+                      TambahBarang(onAddItem: _handleAddItem),
                 ),
               );
             },
@@ -327,58 +318,70 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 100,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.image_not_supported,
-                  color: Colors.grey,
-                  size: 48,
-                ),
+                child: const Icon(Icons.image, size: 48),
               ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 8.0),
             Text(
               item['name'],
               style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
               ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 8),
-            Text(
-              item['category'],
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Rp ${item['price'].toString()}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              decoration: BoxDecoration(
-                color: _getStatusColor(item['status']),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Text(
-                item['status'],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
+            const SizedBox(height: 8.0),
+            Row(
+              children: [
+                Icon(Icons.category, size: 16, color: Colors.grey[700]),
+                const SizedBox(width: 4.0),
+                Text(
+                  item['category'],
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.grey[600],
+                  ),
                 ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              'Stok: ${item['stock']}',
+              style: const TextStyle(
+                fontSize: 14.0,
+                color: Colors.black,
               ),
+            ),
+            const SizedBox(height: 4.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Rp ${item['price'].toString()}',
+                  style: const TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(item['status']),
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Text(
+                    item['status'],
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
