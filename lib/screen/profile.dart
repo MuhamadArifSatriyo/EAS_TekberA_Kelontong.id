@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -13,6 +13,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _namaTokoController = TextEditingController();
   final _namaPemilikController = TextEditingController();
   final _alamatController = TextEditingController();
+
+  File? _imageFile; // Gambar lokal
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -34,22 +37,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setString('namaToko', _namaTokoController.text.trim());
     await prefs.setString('namaPemilik', _namaPemilikController.text.trim());
     await prefs.setString('alamatToko', _alamatController.text.trim());
+    if (_imageFile != null) {
+      await prefs.setString('profileImagePath', _imageFile!.path);
+    }
   }
 
-  Future<bool> _saveToFile() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/profile.txt');
-      final content = 'Nama Toko: ${_namaTokoController.text}\n'
-          'Nama Pemilik: ${_namaPemilikController.text}\n'
-          'Alamat: ${_alamatController.text}\n';
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery, // Ubah ke ImageSource.camera untuk kamera
+    );
 
-      await file.writeAsString(content);
-      print("Data berhasil disimpan ke file: ${file.path}");
-      return true; // Indikator sukses
-    } catch (e) {
-      print("Gagal menyimpan file: $e");
-      return false; // Indikator gagal
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
     }
   }
 
@@ -64,93 +65,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Edit Profil'),
-        backgroundColor: Colors.blue.shade800,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Ikon tetap back
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushNamed(context, '/home'); // Navigasi ke '/home'
+            Navigator.pushNamed(context, '/home');
           },
         ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade100, Colors.blue.shade300],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+        title: const Text(
+          'Edit Profil',
+          style: TextStyle(color: Colors.white),
         ),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.35,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade200, Colors.blue.shade400],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('images/profile.png'),
+                const SizedBox(height: 60),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: _imageFile != null
+                        ? FileImage(_imageFile!)
+                        : const AssetImage('images/profile.png') as ImageProvider,
+                  ),
                 ),
                 TextButton(
-                  onPressed: () {
-                    // Implement image update feature if needed
-                  },
+                  onPressed: _pickImage,
                   child: const Text(
                     'Ubah Gambar',
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _buildTextInput(
-                  controller: _namaTokoController,
-                  label: "Nama Toko",
-                  hint: "Masukkan nama toko",
-                ),
-                const SizedBox(height: 20),
-                _buildTextInput(
-                  controller: _namaPemilikController,
-                  label: "Nama Pemilik",
-                  hint: "Masukkan nama pemilik",
-                ),
-                const SizedBox(height: 20),
-                _buildTextInput(
-                  controller: _alamatController,
-                  label: "Alamat",
-                  hint: "Masukkan alamat",
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      await _updateDataToSharedPreferences();
-                      await _saveToFile();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Profil berhasil diperbarui!'),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 32),
-                    backgroundColor: Colors.blue.shade800,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "Update",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildTextInput(
+                        controller: _namaTokoController,
+                        label: "Nama Toko",
+                        hint: "Masukkan nama toko",
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextInput(
+                        controller: _namaPemilikController,
+                        label: "Nama Pemilik",
+                        hint: "Masukkan nama pemilik",
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextInput(
+                        controller: _alamatController,
+                        label: "Alamat",
+                        hint: "Masukkan alamat",
+                      ),
+                      const SizedBox(height: 30),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            await _updateDataToSharedPreferences();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Profil berhasil diperbarui!'),
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16, horizontal: 32),
+                          backgroundColor: Colors.blue.shade800,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          "Update",
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -160,25 +187,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String label,
     required String hint,
   }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        labelStyle: TextStyle(color: Colors.blue.shade700),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hint,
+            labelStyle: TextStyle(color: Colors.blue.shade700),
+            border: InputBorder.none,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "$label harus diisi";
+            }
+            return null;
+          },
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "$label harus diisi";
-        }
-        return null;
-      },
     );
   }
 }
