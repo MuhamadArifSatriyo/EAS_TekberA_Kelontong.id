@@ -3,8 +3,7 @@ import '../screen/welcome_screen.dart';
 import '../screen/home_screen.dart';
 import '../screen/dashboard_screen.dart';
 import '../screen/about_us_screen.dart';
-import '../screen/profile.dart'; // Import halaman profil
-import '../screen/transactions.dart'; // Import halaman transaksi
+import '../screen/profile.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
@@ -29,13 +28,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
       initialRoute: initialRoute, // Define the initial route
       routes: {
-        '/': (context) => WelcomeScreen(), // Welcome screen route
-        '/home': (context) => HomeScreen(), // Home screen route
-        '/dashboard': (context) => DashboardScreen(), // Dashboard screen route
-        '/aboutUs': (context) => AboutUsScreen(), // AboutUs screen route
-        '/profile': (context) => ProfileScreen(), // Profile screen route
-        '/transactions': (context) =>
-            TransactionsScreen(), // Transactions screen route
+        '/': (context) => WelcomeScreen(), 
+        '/home': (context) => HomeScreen(), 
+        '/dashboard': (context) => DashboardScreen(), 
+        '/aboutUs': (context) => AboutUsScreen(), 
+        '/profile': (context) => ProfileScreen(), 
       },
     );
   }

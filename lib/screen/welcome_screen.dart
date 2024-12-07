@@ -41,10 +41,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     await profileFile.writeAsString(profileData);
   }
 
+
   void _navigateToHome() async {
     if (_formKey.currentState!.validate()) {
       await _saveDataToSharedPreferences();
-      await _saveDataToFile();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),

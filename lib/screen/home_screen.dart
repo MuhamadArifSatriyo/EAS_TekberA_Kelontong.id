@@ -19,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _inventory = [];
   String _searchQuery = '';
-  String _namaToko = 'Toko Anda'; // Variable to store store name
+  String _namaToko = 'Toko Anda';
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categories = [
@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadNamaToko();
   }
 
-  // Load store name from SharedPreferences
   Future<void> _loadNamaToko() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -46,58 +45,48 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Load inventory from text file
   Future<void> _loadInventory() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/inventory.txt');
-
-    if (await file.exists()) {
-      final contents = await file.readAsString();
-      List<dynamic> jsonData = json.decode(contents);
+    final prefs = await SharedPreferences.getInstance();
+    final savedData = prefs.getString('inventory');
+    if (savedData != null) {
       setState(() {
-        _inventory = List<Map<String, dynamic>>.from(jsonData);
+        _inventory = List<Map<String, dynamic>>.from(json.decode(savedData));
       });
     }
   }
 
-  // Save inventory to text file
   Future<void> _saveInventory() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/inventory.txt');
-
-    String jsonData = json.encode(_inventory);
-    await file.writeAsString(jsonData);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('inventory', json.encode(_inventory));
   }
 
-  void _onEditItem(Map<String, dynamic> itemData) {
+  void _onEditItem(Map<String, dynamic> updatedItem) {
     setState(() {
-      final index =
-          _inventory.indexWhere((item) => item['name'] == itemData['name']);
+      final index = _inventory.indexWhere((item) => item['name'] == updatedItem['name']);
       if (index != -1) {
-        _inventory[index] = itemData; // Update item
+        _inventory[index] = updatedItem;
       }
     });
-    _saveInventory(); // Simpan data yang telah diperbarui
+    _saveInventory();
   }
 
   void _onDeleteItem(Map<String, dynamic> item) {
     setState(() {
-      _inventory.removeWhere(
-          (existingItem) => existingItem['name'] == item['name']); // Hapus item
+      _inventory.removeWhere((existingItem) => existingItem['name'] == item['name']);
     });
-    _saveInventory(); // Simpan data setelah dihapus
+    _saveInventory();
   }
 
-  void _handleAddItem(Map<String, dynamic> itemData) {
+  void _handleAddItem(Map<String, dynamic> newItem) {
     setState(() {
       _inventory.add({
-        'name': itemData['nama'],
-        'category': itemData['kategori'],
-        'stock': itemData['stok'],
-        'price': itemData['harga'],
-        'description': itemData['deskripsi'],
-        'status': _getStockStatus(itemData['stok']),
-        'imagePath': itemData['imagePath'],
+        'name': newItem['nama'],
+        'category': newItem['kategori'],
+        'stock': newItem['stok'],
+        'price': newItem['harga'],
+        'description': newItem['deskripsi'],
+        'status': _getStockStatus(newItem['stok']),
+        'imagePath': newItem['imagePath'],
       });
     });
     _saveInventory();
@@ -122,18 +111,40 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Fungsi untuk debugging SharedPreferences
-  Future<void> printSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    debugPrint('Data SharedPreferences: ${prefs.getString('namaToko')}');
+  // Fungsi untuk menangani popback dengan konfirmasi
+  Future<bool> _onWillPop() async {
+    // Menampilkan dialog konfirmasi ketika pengguna mencoba menekan tombol kembali
+    final shouldPop = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi'),
+          content: Text('Apakah Anda yakin ingin kembali ke halaman sebelumnya?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true); // Keluar dari halaman
+              },
+              child: Text('Ya'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false); // Tidak keluar
+              },
+              child: Text('Tidak'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldPop ?? false; // Mengembalikan nilai yang didapatkan dari dialog
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+      onWillPop: _onWillPop, // Menambahkan konfirmasi saat tombol back ditekan
       child: DefaultTabController(
         length: _categories.length,
         child: Scaffold(
@@ -152,15 +163,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             title: Text.rich(
               TextSpan(
-                text: 'Halo, ',
+                text: 'Halo, ', 
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.bold, 
                 ),
                 children: [
                   TextSpan(
-                    text: '$_namaToko',
+                    text: '$_namaToko', 
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: Colors.black, 
                       fontWeight: FontWeight.normal,
                     ),
                   ),
@@ -365,20 +376,25 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              decoration: BoxDecoration(
-                color: _getStatusColor(item['status']),
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Text(
-                item['status'],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${item['stock'].toString()}',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: _getStatusColor(item['status']),
+                  ),
                 ),
-              ),
+                Text(
+                  item['status'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _getStatusColor(item['status']),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
