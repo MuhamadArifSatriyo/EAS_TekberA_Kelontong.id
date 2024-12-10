@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_manager/screen/welcome_screen.dart';
 import 'package:inventory_manager/widget/kelontong_drawer.dart';
 import '../screen/tambah_barang.dart';
 import '../screen/detail_barang.dart';
@@ -111,20 +112,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Fungsi untuk menangani popback dengan konfirmasi
   Future<bool> _onWillPop() async {
-    // Menampilkan dialog konfirmasi ketika pengguna mencoba menekan tombol kembali
     final shouldPop = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Konfirmasi'),
-          content: Text('Apakah Anda yakin ingin kembali ke halaman sebelumnya?'),
+          content: Text('Apakah anda ingin keluar?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(true); // Keluar dari halaman
-              },
+              Navigator.of(context).pop(true); 
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => WelcomeScreen()), 
+              );
+            },
               child: Text('Ya'),
             ),
             TextButton(
@@ -138,13 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
 
-    return shouldPop ?? false; // Mengembalikan nilai yang didapatkan dari dialog
+    return shouldPop ?? false; 
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop, // Menambahkan konfirmasi saat tombol back ditekan
+      onWillPop: _onWillPop, 
       child: DefaultTabController(
         length: _categories.length,
         child: Scaffold(

@@ -94,15 +94,6 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                leading: const Icon(Icons.shopping_cart),
-                title: const Text('Transaksi'),
-                onTap: () {
-                  Navigator.pushNamed(
-                      context, '/transactions'); // Route ke '/transactions'
-                },
-              ),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
                 leading: const Icon(Icons.info),
                 title: const Text('Tentang Kami'),
                 onTap: () {
